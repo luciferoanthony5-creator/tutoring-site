@@ -1,0 +1,26 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage[hidelinks]{hyperref}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small AntsPhysicsLessons.com}
+\rhead{\small Electricity \& Magnetism}
+\cfoot{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\setlength{\parindent}{0pt}
+\definecolor{keybg}{RGB}{240,244,250}
+\newmdenv[backgroundcolor=keybg,linewidth=0pt,innerleftmargin=8pt,innerrightmargin=8pt,innertopmargin=6pt,innerbottommargin=6pt,skipabove=6pt]{answer}
+\begin{document}
+{\small\textsc{Unit 2 -- Gauss's Law}}\\[2pt]{\Large\bfseries 2.1 Fields of Continuous Charge Distributions}\\[8pt]\textbf{Answer key}\\[4pt]\hrule\vspace{10pt}{\small\itshape Placeholder worksheet for the site prototype. Free for classroom use.}\vspace{6pt}
+\begin{enumerate}[leftmargin=*,itemsep=10pt]
+\item A thin rod of length $L$ carries total charge $Q$ spread uniformly along it. Find the electric field at a point on the rod's axis a distance $a$ from the nearer end.
+\begin{answer}Let $\lambda = Q/L$ and put the near end at $x=0$ with the field point at $x=-a$. A slice $dq = \lambda\,dx$ at position $x$ is a distance $a + x$ away, so $dE = \dfrac{k\lambda\,dx}{(a+x)^2}$. Integrating: $E = k\lambda\displaystyle\int_0^{L}\frac{dx}{(a+x)^2} = k\lambda\left[\frac{1}{a} - \frac{1}{a+L}\right] = \frac{kQ}{a(a+L)}$, pointing away from the rod.\end{answer}
+\item A ring of radius $R$ carries charge $Q$ uniformly. Find the field on the axis a distance $z$ from the centre, and the value of $z$ where it is largest.
+\begin{answer}By symmetry only the axial component survives: $E_z = \dfrac{kQz}{(z^2+R^2)^{3/2}}$. Setting $dE_z/dz = 0$ gives $z^2 + R^2 - 3z^2 = 0$, so the maximum is at $z = R/\sqrt{2}$.\end{answer}
+\end{enumerate}
+\end{document}

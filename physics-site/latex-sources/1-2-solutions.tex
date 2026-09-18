@@ -1,0 +1,28 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage[hidelinks]{hyperref}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small AntsPhysicsLessons.com}
+\rhead{\small Electricity \& Magnetism}
+\cfoot{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\setlength{\parindent}{0pt}
+\definecolor{keybg}{RGB}{240,244,250}
+\newmdenv[backgroundcolor=keybg,linewidth=0pt,innerleftmargin=8pt,innerrightmargin=8pt,innertopmargin=6pt,innerbottommargin=6pt,skipabove=6pt]{answer}
+\begin{document}
+{\small\textsc{Unit 1 -- Electric Charge, Force, and Field}}\\[2pt]{\Large\bfseries 1.2 Electric Field of Point Charges}\\[8pt]\textbf{Answer key}\\[4pt]\hrule\vspace{10pt}{\small\itshape Placeholder worksheet for the site prototype. Free for classroom use.}\vspace{6pt}
+\begin{enumerate}[leftmargin=*,itemsep=10pt]
+\item Find the magnitude of the electric field $0.050$~m from a point charge of $+8.0$~nC.
+\begin{answer}$E = \dfrac{kq}{r^2} = \dfrac{(8.99\times10^{9})(8.0\times10^{-9})}{(0.050)^2} = 2.9\times10^{4}\ \text{N/C}$, directed away from the charge.\end{answer}
+\item A charge $+q$ sits at $x=0$ and a charge $+4q$ sits at $x=d$. Where on the $x$-axis is the net electric field zero?
+\begin{answer}Only between the charges can the fields cancel. Set $\dfrac{kq}{x^2} = \dfrac{4kq}{(d-x)^2}$, so $(d-x)^2 = 4x^2$ and $d - x = 2x$, giving $x = d/3$.\end{answer}
+\item An electron is released from rest in a uniform field of $2.0\times10^{3}$~N/C. Find its acceleration (magnitude and direction relative to $\vec{E}$).
+\begin{answer}$a = \dfrac{eE}{m_e} = \dfrac{(1.60\times10^{-19})(2.0\times10^{3})}{9.11\times10^{-31}} = 3.5\times10^{14}\ \text{m/s}^2$, opposite to $\vec{E}$ because the electron is negative.\end{answer}
+\end{enumerate}
+\end{document}

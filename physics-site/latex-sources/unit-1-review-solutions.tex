@@ -1,0 +1,28 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage[hidelinks]{hyperref}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small AntsPhysicsLessons.com}
+\rhead{\small Electricity \& Magnetism}
+\cfoot{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\setlength{\parindent}{0pt}
+\definecolor{keybg}{RGB}{240,244,250}
+\newmdenv[backgroundcolor=keybg,linewidth=0pt,innerleftmargin=8pt,innerrightmargin=8pt,innertopmargin=6pt,innerbottommargin=6pt,skipabove=6pt]{answer}
+\begin{document}
+{\small\textsc{Unit 1 -- Electric Charge, Force, and Field}}\\[2pt]{\Large\bfseries Unit 1 Review}\\[8pt]\textbf{Answer key}\\[4pt]\hrule\vspace{10pt}{\small\itshape Placeholder worksheet for the site prototype. Free for classroom use.}\vspace{6pt}
+\begin{enumerate}[leftmargin=*,itemsep=10pt]
+\item Two point charges, $q_1 = +3.0\,\mu\text{C}$ and $q_2 = -5.0\,\mu\text{C}$, are $0.20$~m apart. Find the magnitude of the force each exerts on the other and state whether it is attractive or repulsive.
+\begin{answer}$F = \dfrac{k|q_1 q_2|}{r^2} = \dfrac{(8.99\times10^{9})(3.0\times10^{-6})(5.0\times10^{-6})}{(0.20)^2} = 3.4\ \text{N}$. Opposite signs, so the force is \textbf{attractive}.\end{answer}
+\item Find the magnitude of the electric field $0.050$~m from a point charge of $+8.0$~nC.
+\begin{answer}$E = \dfrac{kq}{r^2} = \dfrac{(8.99\times10^{9})(8.0\times10^{-9})}{(0.050)^2} = 2.9\times10^{4}\ \text{N/C}$, directed away from the charge.\end{answer}
+\item An electron enters a region of uniform field $E = 500$~N/C with speed $2.0\times10^{6}$~m/s perpendicular to the field. How far has it been deflected sideways after travelling $4.0$~cm along its original direction? Ignore gravity.
+\begin{answer}Time in the field: $t = \dfrac{0.040}{2.0\times10^{6}} = 2.0\times10^{-8}$~s. Acceleration: $a = \dfrac{eE}{m_e} = 8.8\times10^{13}$~m/s$^2$. Deflection: $y = \tfrac12 a t^2 = \tfrac12(8.8\times10^{13})(2.0\times10^{-8})^2 = 1.8\times10^{-2}$~m $= 1.8$~cm.\end{answer}
+\end{enumerate}
+\end{document}

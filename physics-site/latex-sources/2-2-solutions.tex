@@ -1,0 +1,26 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage[hidelinks]{hyperref}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small AntsPhysicsLessons.com}
+\rhead{\small Electricity \& Magnetism}
+\cfoot{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\setlength{\parindent}{0pt}
+\definecolor{keybg}{RGB}{240,244,250}
+\newmdenv[backgroundcolor=keybg,linewidth=0pt,innerleftmargin=8pt,innerrightmargin=8pt,innertopmargin=6pt,innerbottommargin=6pt,skipabove=6pt]{answer}
+\begin{document}
+{\small\textsc{Unit 2 -- Gauss's Law}}\\[2pt]{\Large\bfseries 2.2 Electric Flux and Gauss's Law: Spherical Symmetry}\\[8pt]\textbf{Answer key}\\[4pt]\hrule\vspace{10pt}{\small\itshape Placeholder worksheet for the site prototype. Free for classroom use.}\vspace{6pt}
+\begin{enumerate}[leftmargin=*,itemsep=10pt]
+\item A closed surface encloses point charges $q_1 = +2.0$~nC and $q_2 = -5.0$~nC (and a third charge of $+7.0$~nC sits outside). Find the net electric flux through the surface.
+\begin{answer}Only enclosed charge counts: $\Phi_E = \dfrac{q_{\text{enc}}}{\varepsilon_0} = \dfrac{-3.0\times10^{-9}}{8.85\times10^{-12}} = -3.4\times10^{2}\ \text{N}\cdot\text{m}^2/\text{C}$.\end{answer}
+\item An insulating sphere of radius $R$ carries charge $Q$ spread uniformly through its volume. Use Gauss's law to find $E(r)$ for $r<R$ and for $r>R$.
+\begin{answer}Gaussian sphere of radius $r$: $E\,(4\pi r^2) = q_{\text{enc}}/\varepsilon_0$. Outside, $q_{\text{enc}} = Q$ so $E = \dfrac{kQ}{r^2}$. Inside, $q_{\text{enc}} = Q\,\dfrac{r^3}{R^3}$ so $E = \dfrac{kQr}{R^3}$. The two agree at $r = R$.\end{answer}
+\end{enumerate}
+\end{document}

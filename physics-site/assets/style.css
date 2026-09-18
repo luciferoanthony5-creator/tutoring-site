@@ -1,0 +1,241 @@
+/* =====================================================================
+   style.css  -  every page loads this one file.
+   Style option A "Field Lines": IBM Plex Serif headings, IBM Plex Sans
+   body, blue accent. Change a colour once here and it changes site-wide.
+   ===================================================================== */
+
+/* ----- Colour tokens --------------------------------------------------
+   A token is a named value. Rules below say var(--ink) instead of a hex
+   code, so the palette lives in one place.                              */
+:root {
+  --paper:       #F4F6FA;      /* page background                 */
+  --surface:     #FFFFFF;      /* header, cards, video box        */
+  --ink:         #17202E;      /* main text                       */
+  --ink-soft:    #5A6577;      /* secondary text                  */
+  --line:        #D6DCE6;      /* borders and rules               */
+  --accent:      #1F5FD1;      /* links, buttons                  */
+  --accent-ink:  #FFFFFF;      /* text drawn on the accent colour */
+  --accent-soft: #E4ECFB;      /* faint accent tint (hover)       */
+
+  --font-head:   "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --font-body:   "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --radius:      6px;
+}
+
+/* Dark mode: only the tokens change. Applies when the visitor's phone or
+   computer is set to dark. Delete this block to keep the site light-only. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper:       #12161D;
+    --surface:     #1B2129;
+    --ink:         #E6EAF0;
+    --ink-soft:    #9AA5B5;
+    --line:        #2E3742;
+    --accent:      #6FA0FF;
+    --accent-ink:  #0E1523;
+    --accent-soft: #233252;
+  }
+}
+
+/* ----- Base page ------------------------------------------------------- */
+* { box-sizing: border-box; }               /* padding counts inside width */
+html, body { margin: 0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-head);
+  line-height: 1.2;
+  text-wrap: balance;                        /* avoids a lonely last word */
+  margin: 0;
+}
+h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); } /* grows with the screen  */
+h2 { font-size: 1.35rem; }
+h3 { font-size: 1.1rem; }
+p  { margin: 0; }
+
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* One wrapper keeps content in a readable column with side gutters. */
+.wrap {
+  max-width: 880px;
+  margin-inline: auto;                       /* centres the column        */
+  padding-inline: 20px;                      /* the side gutter           */
+}
+
+/* ----- Header and menu ------------------------------------------------- */
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.topbar .wrap { display: flex; align-items: center; gap: 16px; min-height: 58px; }
+.brand {
+  font-family: var(--font-head); font-weight: 600; font-size: 1.15rem;
+  color: var(--ink); text-decoration: none;
+  margin-right: auto;                        /* pushes the menu right     */
+}
+.brand span { color: var(--accent); }
+
+/* The menu is a nested list: ul > li > ul (units) > li > ul (lessons). */
+.menu, .menu ul { list-style: none; margin: 0; padding: 0; }
+.menu { display: flex; gap: 4px; }
+.menu > li { position: relative; }
+.menu a, .menu .menu-label {
+  display: block; padding: 8px 10px;
+  color: var(--ink); text-decoration: none; border-radius: var(--radius);
+  white-space: nowrap;
+}
+.menu > li > a:hover, .menu > li:hover > a { background: var(--accent-soft); }
+
+/* Fly-out level 1 (units): hidden until hovered or focused. */
+.menu ul {
+  display: none;
+  position: absolute; top: 100%; left: 0; min-width: 240px;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,.10);
+  padding: 6px;
+}
+.menu li:hover > ul, .menu li:focus-within > ul { display: block; }
+.menu ul li { position: relative; }
+.menu ul a:hover { background: var(--accent-soft); }
+.menu ul .menu-label { color: var(--ink-soft); font-size: .85rem; cursor: default; }
+.menu ul .menu-label::after { content: " \203A"; }   /* the little › arrow */
+
+/* Fly-out level 2 (lessons): opens to the right of the unit. */
+.menu ul ul { top: -6px; left: 100%; }
+
+/* Menu button: only shown on phones (see the media query at the end). */
+.menu-btn {
+  display: none;
+  font: inherit; font-weight: 600; color: var(--ink);
+  background: none; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 6px 12px; cursor: pointer;
+}
+
+/* ----- Page body ------------------------------------------------------- */
+.page { padding-block: 32px 64px; }         /* top 32px, bottom 64px     */
+.page > .wrap { display: grid; gap: 28px; } /* stacks children with gaps */
+.eyebrow {
+  font-size: .8rem; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-soft); font-weight: 600;
+}
+.lede { color: var(--ink-soft); max-width: 60ch; margin-top: 10px; }
+.prose { max-width: 65ch; display: grid; gap: 14px; }
+
+/* Home page subject cards. */
+.subjects { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.subject-card {
+  display: grid; gap: 6px; padding: 20px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  color: var(--ink); text-decoration: none;
+}
+.subject-card:hover { border-color: var(--accent); }
+.subject-card .count { color: var(--ink-soft); font-size: .9rem; }
+.subject-card.soon { opacity: .6; }
+
+/* Subject page: units are native <details> elements (collapsible for free). */
+.unit-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.unit-controls button {
+  font: inherit; font-size: .9rem; color: var(--accent);
+  background: none; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 5px 10px; cursor: pointer;
+}
+.unit-controls button:hover { background: var(--accent-soft); }
+
+.unit { border-top: 1px solid var(--line); }
+.unit:last-of-type { border-bottom: 1px solid var(--line); }
+.unit > summary {
+  cursor: pointer; list-style: none;         /* hides the default marker  */
+  display: flex; align-items: center; gap: 12px; padding-block: 14px;
+  font-family: var(--font-head); font-weight: 600; font-size: 1.15rem;
+}
+.unit > summary::-webkit-details-marker { display: none; }
+.unit > summary::before {                    /* our own chevron           */
+  content: ""; width: 9px; height: 9px; flex: none; margin-left: 4px;
+  border-right: 2px solid var(--ink-soft); border-bottom: 2px solid var(--ink-soft);
+  transform: rotate(-45deg); transition: transform .15s;
+}
+.unit[open] > summary::before { transform: rotate(45deg); }
+.unit > summary a { color: var(--accent); text-decoration: none; }
+.unit > summary a:hover { text-decoration: underline; }
+.unit > summary .plain { color: var(--ink); }
+.unit .lessons { list-style: none; margin: 0; padding: 0 0 16px 25px; display: grid; gap: 6px; }
+.unit .lessons li.review { font-weight: 600; margin-top: 4px; }
+.unit .lessons .note { color: var(--ink-soft); font-size: .92rem; font-style: italic; }
+
+/* ----- Lesson page ----------------------------------------------------- */
+.prevnext {
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center;
+  font-size: .95rem; min-height: 1.5em;
+}
+.prevnext .center { text-align: center; color: var(--ink-soft); }
+.prevnext a { text-decoration: none; }
+.prevnext .next { text-align: right; }
+.prevnext .off { color: var(--ink-soft); }
+
+/* The video box keeps a 16:9 shape at any width. */
+.video {
+  aspect-ratio: 16 / 9; width: 100%; max-width: 100%;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  overflow: hidden;
+}
+.video iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+/* Downloads, stacked under the video. */
+.downloads { display: grid; gap: 10px; }
+.downloads a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  color: var(--ink); text-decoration: none;
+}
+.downloads a:hover { border-color: var(--accent); }
+.downloads .pdf {
+  font-size: .7rem; font-weight: 700; letter-spacing: .05em;
+  color: var(--accent); border: 1.5px solid currentColor; border-radius: 3px;
+  padding: 2px 5px; flex: none;
+}
+.downloads .file { margin-left: auto; color: var(--ink-soft); font-size: .85rem; }
+
+/* Reserved ad slot (Phase 4). Keeping the space now means ads will not
+   shift the layout later. It stays hidden until AdSense is set up.     */
+.ad-slot {
+  min-height: 90px; display: grid; place-items: center;
+  border: 1px dashed var(--line); border-radius: var(--radius);
+  color: var(--ink-soft); font-size: .85rem;
+}
+
+/* ----- Footer ---------------------------------------------------------- */
+footer { border-top: 1px solid var(--line); color: var(--ink-soft); font-size: .9rem; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 20px; padding-block: 20px; }
+
+/* ----- Phones (720px wide or narrower) --------------------------------- */
+@media (max-width: 720px) {
+  .menu-btn { display: inline-block; }
+  .menu {                                    /* menu becomes a stacked panel */
+    display: none; position: absolute; top: 100%; left: 0; right: 0;
+    flex-direction: column; gap: 0;
+    background: var(--surface); border-bottom: 1px solid var(--line);
+    padding: 8px 12px 12px; max-height: 70vh; overflow-y: auto;
+  }
+  .menu.open { display: flex; }              /* nav.js adds class "open"  */
+  .menu ul, .menu li:hover > ul, .menu li:focus-within > ul {
+    display: block; position: static;        /* no fly-outs: just indent  */
+    border: 0; box-shadow: none; min-width: 0; padding: 0 0 0 16px;
+  }
+  .menu ul ul { padding-left: 16px; }
+  .menu ul .menu-label::after { content: ""; }
+  .topbar .wrap { position: relative; }
+  .prevnext { grid-template-columns: 1fr 1fr; }
+  .prevnext .center { grid-column: 1 / -1; order: -1; } /* title on its own row */
+}
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

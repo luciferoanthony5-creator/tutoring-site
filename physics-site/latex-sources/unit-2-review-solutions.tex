@@ -1,0 +1,28 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage[hidelinks]{hyperref}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small AntsPhysicsLessons.com}
+\rhead{\small Electricity \& Magnetism}
+\cfoot{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\setlength{\parindent}{0pt}
+\definecolor{keybg}{RGB}{240,244,250}
+\newmdenv[backgroundcolor=keybg,linewidth=0pt,innerleftmargin=8pt,innerrightmargin=8pt,innertopmargin=6pt,innerbottommargin=6pt,skipabove=6pt]{answer}
+\begin{document}
+{\small\textsc{Unit 2 -- Gauss's Law}}\\[2pt]{\Large\bfseries Unit 2 Review}\\[8pt]\textbf{Answer key}\\[4pt]\hrule\vspace{10pt}{\small\itshape Placeholder worksheet for the site prototype. Free for classroom use.}\vspace{6pt}
+\begin{enumerate}[leftmargin=*,itemsep=10pt]
+\item A thin rod of length $L$ carries total charge $Q$ spread uniformly along it. Find the electric field at a point on the rod's axis a distance $a$ from the nearer end.
+\begin{answer}Let $\lambda = Q/L$ and put the near end at $x=0$ with the field point at $x=-a$. A slice $dq = \lambda\,dx$ at position $x$ is a distance $a + x$ away, so $dE = \dfrac{k\lambda\,dx}{(a+x)^2}$. Integrating: $E = k\lambda\displaystyle\int_0^{L}\frac{dx}{(a+x)^2} = k\lambda\left[\frac{1}{a} - \frac{1}{a+L}\right] = \frac{kQ}{a(a+L)}$, pointing away from the rod.\end{answer}
+\item A closed surface encloses point charges $q_1 = +2.0$~nC and $q_2 = -5.0$~nC (and a third charge of $+7.0$~nC sits outside). Find the net electric flux through the surface.
+\begin{answer}Only enclosed charge counts: $\Phi_E = \dfrac{q_{\text{enc}}}{\varepsilon_0} = \dfrac{-3.0\times10^{-9}}{8.85\times10^{-12}} = -3.4\times10^{2}\ \text{N}\cdot\text{m}^2/\text{C}$.\end{answer}
+\item An infinitely long line of charge has linear density $\lambda = 2.0\,\mu\text{C/m}$. Find $E$ at a perpendicular distance of $0.050$~m.
+\begin{answer}Gaussian cylinder of radius $r$ and length $\ell$: $E\,(2\pi r\ell) = \lambda\ell/\varepsilon_0$, so $E = \dfrac{\lambda}{2\pi\varepsilon_0 r} = \dfrac{2k\lambda}{r} = \dfrac{2(8.99\times10^{9})(2.0\times10^{-6})}{0.050} = 7.2\times10^{5}\ \text{N/C}$.\end{answer}
+\end{enumerate}
+\end{document}

@@ -1,0 +1,28 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage[hidelinks]{hyperref}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small AntsPhysicsLessons.com}
+\rhead{\small Electricity \& Magnetism}
+\cfoot{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\setlength{\parindent}{0pt}
+\definecolor{keybg}{RGB}{240,244,250}
+\newmdenv[backgroundcolor=keybg,linewidth=0pt,innerleftmargin=8pt,innerrightmargin=8pt,innertopmargin=6pt,innerbottommargin=6pt,skipabove=6pt]{answer}
+\begin{document}
+{\small\textsc{Unit 2 -- Gauss's Law}}\\[2pt]{\Large\bfseries 2.3 Gauss's Law: Cylindrical and Planar Symmetry}\\[8pt]\textbf{Answer key}\\[4pt]\hrule\vspace{10pt}{\small\itshape Placeholder worksheet for the site prototype. Free for classroom use.}\vspace{6pt}
+\begin{enumerate}[leftmargin=*,itemsep=10pt]
+\item An infinitely long line of charge has linear density $\lambda = 2.0\,\mu\text{C/m}$. Find $E$ at a perpendicular distance of $0.050$~m.
+\begin{answer}Gaussian cylinder of radius $r$ and length $\ell$: $E\,(2\pi r\ell) = \lambda\ell/\varepsilon_0$, so $E = \dfrac{\lambda}{2\pi\varepsilon_0 r} = \dfrac{2k\lambda}{r} = \dfrac{2(8.99\times10^{9})(2.0\times10^{-6})}{0.050} = 7.2\times10^{5}\ \text{N/C}$.\end{answer}
+\item A large flat insulating sheet carries surface charge density $\sigma = 1.0\times10^{-6}$~C/m$^2$. Find the field near the sheet.
+\begin{answer}Gaussian pillbox with faces of area $A$ on both sides: $2EA = \sigma A/\varepsilon_0$, so $E = \dfrac{\sigma}{2\varepsilon_0} = \dfrac{1.0\times10^{-6}}{2(8.85\times10^{-12})} = 5.6\times10^{4}\ \text{N/C}$, perpendicular to the sheet.\end{answer}
+\item Explain why the field just outside a charged conductor in electrostatic equilibrium is $E = \sigma/\varepsilon_0$, twice the value for the thin sheet above.
+\begin{answer}Inside a conductor in equilibrium $E = 0$, so a pillbox straddling the surface has flux only through its outer face: $EA = \sigma A/\varepsilon_0$, giving $E = \sigma/\varepsilon_0$. The thin sheet has flux through both faces, which halves the result.\end{answer}
+\end{enumerate}
+\end{document}
