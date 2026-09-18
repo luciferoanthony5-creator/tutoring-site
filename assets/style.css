@@ -131,7 +131,7 @@ a:hover { text-decoration-thickness: 2px; }
 .prose { max-width: 65ch; display: grid; gap: 14px; }
 
 /* Home page subject cards. */
-.subjects { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.subjects { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); } /*  wide screen, subject cards sit side by side; on a narrow phone screen, they automatically stack into a single column  */
 .subject-card {
   display: grid; gap: 6px; padding: 20px;
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);

@@ -11,13 +11,13 @@
    Field guide:
      slug     - file name without .html, e.g. "1-1-coulombs-law"
      title    - shown in menus, lists, and prev/next links
-     review   - true for a review page (bold in the unit list)
+     review   - true for a review page (bold in the unit li st)
      overview - true for the unit overview page (it is the unit's
                 index.html and the unit heading becomes a link to it)
      note     - optional one-line note shown under the lesson in the list
    ===================================================================== */
 
-const SITE_NAME = "AntsPhysicsLessons";     // placeholder - change here only
+const SITE_NAME = "AntsPhysicsLessons";     // const declares a value -- the site name
 const SITE_TLD  = ".com";
 
 const SUBJECTS = [

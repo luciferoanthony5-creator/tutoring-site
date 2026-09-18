@@ -12,8 +12,8 @@
      data-lesson="1-1-..."     (lesson pages) the lesson slug
    ===================================================================== */
 
-/* $("id") is shorthand for document.getElementById("id"). */
-const $ = (id) => document.getElementById(id);
+/* $("id") is shorthand for document.getElementById("id") $ is the name of the function. */
+const $ = (id) => document.getElementById(id); // defines a function using arrow syntax
 
 /* Escape text before putting it into HTML so "&" or "<" in a title
    cannot be mistaken for HTML. */
