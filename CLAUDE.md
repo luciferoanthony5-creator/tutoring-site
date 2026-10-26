@@ -29,3 +29,9 @@ pages without being asked.
 - I'm new to HTML/CSS/JS: put a short comment beside each line explaining the syntax.
 - Test locally with `python3 -m http.server 8000` (YouTube fails from `file://`).
 - Commit with a clear message; I push. Custom-domain steps are in the README.
+
+## Design tools
+- The site's chosen style (style A "Field Lines": IBM Plex Serif headings, IBM Plex Sans body, blue accent #1F5FD1) always wins over any skill's default taste.
+- Use only the skill I name in a request (`emil-design-eng`, `impeccable`, `design-taste-frontend`, or `frontend-design`). Don't combine them unless I ask. (The Taste skill's repo name is `design-taste-frontend`, not `-v1`.)
+- Use Playwright to check pages at http://localhost:8000 (start `python3 -m http.server 8000` first) at desktop (1280px) and phone (390px) widths.
+- Use Figma only when I give you a Figma link.
