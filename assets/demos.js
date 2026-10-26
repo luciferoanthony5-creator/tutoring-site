@@ -4,7 +4,7 @@
    A page picks a demo with an attribute on a <canvas>:
      <canvas data-demo="field">       interactive electric-field demo
      <canvas data-demo="projectile">  interactive projectile launcher
-     <canvas data-demo="background">  non-interactive loop of both demos,
+     <canvas data-demo="background">  non-interactive loop of three demos,
                                       used behind the home page
 
    Field demo: two charges, field lines leave the positive one and end on
@@ -13,8 +13,11 @@
    Keyboard: press 1 or 2 to pick a charge, arrow keys to move it, Enter
    to flip its sign.
 
-   Projectile demo: press and drag to aim, release to launch. The red ball
-   feels gravity; the grey ghost ball, launched at the same moment, does not.
+   Projectile demo: press and drag to aim, release to launch. The dots are
+   0.25 s apart, so equal spacing sideways shows constant horizontal speed.
+
+   The home-page background loops three scenes: field lines, projectiles,
+   and charges entering and leaving a magnetic field.
    ===================================================================== */
 
 (() => {                                           // wraps everything so names stay private
@@ -159,6 +162,7 @@
       time: 0, shots: [], nextSpawn: 0,
       aim: { v: 24, a: (55 * Math.PI) / 180 },     // launch speed (m/s) and angle (radians)
       showAim: mode === "play",
+      aimAlpha: 1,                                 // how bright the launch arrow is (dims while a ball flies)
     };
 
     s.setSize = (w, h) => {
@@ -168,75 +172,74 @@
       s.k = s.ppm * 1.1;                           // pixels of arrow per m/s of speed
     };
 
-    const flightTime = (sh) => (2 * sh.v * Math.sin(sh.a)) / G;   // seconds until the real ball lands
+    const flightTime = (sh) => (2 * sh.v * Math.sin(sh.a)) / G;   // seconds until the ball lands
     const age = (sh) => s.time - sh.t0;                           // seconds since launch
 
     /* Start a shot. instant = true jumps straight to the finished flight (reduced motion). */
-    s.launch = (v, a, ghost, instant) => {
-      const sh = { v, a, ghost, t0: s.time };
+    s.launch = (v, a, instant) => {
+      const sh = { v, a, t0: s.time };
       if (instant) sh.t0 = s.time - flightTime(sh) - 0.001;
       s.shots.push(sh);
     };
 
+    s.flying = () => s.shots.some((sh) => age(sh) < flightTime(sh));          // is a ball still in the air?
+    const aimTarget = () => (s.flying() ? 0.3 : 1);                           // arrow dims while a ball flies
+    s.active = () => s.flying() || Math.abs(s.aimAlpha - aimTarget()) > 0.01; // does the loop still need to run?
+
     /* Advance time by dt seconds; in ambient mode, also fire and retire shots. */
     s.step = (dt) => {
       s.time += dt;
+      s.aimAlpha = reduceMotion ? aimTarget() : s.aimAlpha + (aimTarget() - s.aimAlpha) * Math.min(1, dt * 14); // ease the arrow's brightness
       if (mode !== "ambient") return;
       if (s.time >= s.nextSpawn) {                 // time for another shot
-        const v = 22 + Math.random() * 12, a = ((35 + Math.random() * 35) * Math.PI) / 180;
-        s.launch(v, a, false);
+        s.launch(22 + Math.random() * 12, ((35 + Math.random() * 35) * Math.PI) / 180);
         s.nextSpawn = s.time + 0.9 + Math.random() * 0.6;
       }
       s.shots = s.shots.filter((sh) => age(sh) < flightTime(sh) + 3);  // drop shots once faded out
     };
 
-    s.busy = () => s.shots.some((sh) => age(sh) < flightTime(sh));    // is anything still flying?
-
-    /* Pixel position at time t after launch. gravity false = the ghost ball. */
-    const at = (sh, t, gravity) => ({
+    /* Pixel position at time t after launch. */
+    const at = (sh, t) => ({
       x: s.ox + sh.v * Math.cos(sh.a) * t * s.ppm,
-      y: s.gy - ballR - (sh.v * Math.sin(sh.a) * t - (gravity ? 0.5 * G * t * t : 0)) * s.ppm,
+      y: s.gy - ballR - (sh.v * Math.sin(sh.a) * t - 0.5 * G * t * t) * s.ppm,
     });
 
-    /* Draw one path: a line up to time tEnd, a dot every 0.25 s, and the ball. */
-    function path(ctx, sh, gravity, tEnd, color, alpha, showBall = true) {
-      ctx.globalAlpha *= alpha;
-      ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.6;
-      ctx.setLineDash(gravity ? [] : [4, 5]);      // ghost path is dashed
+    /* Draw one flight: a line up to time tEnd, a dot every 0.25 s, and the ball. */
+    function path(ctx, sh, tEnd, alpha) {
+      const before = ctx.globalAlpha;              // remember the alpha we were given
+      ctx.globalAlpha = before * alpha;
+      const red = css("--pos");
+      ctx.strokeStyle = red; ctx.fillStyle = red; ctx.lineWidth = 1.6;
       ctx.beginPath();
       for (let t = 0; t <= tEnd; t += 0.04) {
-        const p = at(sh, t, gravity);
+        const p = at(sh, t);
         if (t === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
       }
-      const e = at(sh, tEnd, gravity); ctx.lineTo(e.x, e.y);
-      ctx.stroke(); ctx.setLineDash([]);
+      const e = at(sh, tEnd); ctx.lineTo(e.x, e.y);
+      ctx.stroke();
       for (let t = 0.25; t <= tEnd; t += 0.25) {   // evenly timed dots: equal spacing in x shows constant horizontal speed
-        const p = at(sh, t, gravity);
+        const p = at(sh, t);
         ctx.beginPath(); ctx.arc(p.x, p.y, 2.4, 0, 2 * Math.PI); ctx.fill();
       }
-      if (showBall) { ctx.beginPath(); ctx.arc(e.x, e.y, ballR, 0, 2 * Math.PI); ctx.fill(); }   // the ball itself
-      ctx.globalAlpha /= alpha;
+      ctx.beginPath(); ctx.arc(e.x, e.y, ballR, 0, 2 * Math.PI); ctx.fill();   // the ball itself
+      ctx.globalAlpha = before;                    // put the alpha back exactly as it was
     }
 
     s.draw = (ctx) => {
-      const ink = css("--ink"), red = css("--pos"), grey = css("--grid");
       ctx.lineCap = "round";
-      ctx.strokeStyle = grey; ctx.lineWidth = 1;   // the ground
+      ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;   // the ground
       ctx.beginPath(); ctx.moveTo(0, s.gy + 0.5); ctx.lineTo(s.w, s.gy + 0.5); ctx.stroke();
       for (const sh of s.shots) {
         const t = age(sh), T = flightTime(sh);
-        const alpha = t > T ? Math.max(0, 1 - (t - T) / 3) : 1;    // fade after landing (ambient only removes them)
-        const keep = mode === "play" ? 1 : alpha;
-        if (sh.ghost) {                                            // ghost: no gravity, flies on until it leaves the top
-          const tOff = (s.gy + 20) / (sh.v * Math.sin(sh.a) * s.ppm);
-          path(ctx, sh, false, Math.min(t, tOff), grey, 1, t <= tOff);   // its dashed path stays after the ball is gone
-        }
-        path(ctx, sh, true, Math.min(t, T), red, keep);            // the real ball stops at the ground
+        const fadeIn = mode === "ambient" ? Math.min(1, t / 0.25) : 1;          // ambient shots fade in instead of popping
+        const fadeOut = mode === "ambient" && t > T ? Math.max(0, 1 - (t - T) / 3) : 1;  // and fade out after landing
+        path(ctx, sh, Math.min(t, T), fadeIn * fadeOut);                        // the ball stops at the ground
       }
       if (s.showAim) {                             // the launch arrow
-        const busy = s.busy();
+        const ink = css("--ink");
         const tipX = s.ox + Math.cos(s.aim.a) * s.aim.v * s.k, tipY = s.gy - Math.sin(s.aim.a) * s.aim.v * s.k;
-        ctx.globalAlpha = busy ? 0.3 : 1;          // dim while a ball is flying
+        const before = ctx.globalAlpha;
+        ctx.globalAlpha = before * s.aimAlpha;
         ctx.strokeStyle = ink; ctx.fillStyle = ink; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.moveTo(s.ox, s.gy); ctx.lineTo(tipX, tipY); ctx.stroke();
         const tx = Math.cos(s.aim.a), ty = -Math.sin(s.aim.a);     // arrow direction on screen
@@ -246,7 +249,78 @@
         ctx.lineTo(tipX + ty * 6, tipY - tx * 6);
         ctx.closePath(); ctx.fill();
         ctx.beginPath(); ctx.arc(s.ox, s.gy, 4, 0, 2 * Math.PI); ctx.fill();   // launcher
-        ctx.globalAlpha = 1;
+        ctx.globalAlpha = before;
+      }
+    };
+    return s;
+  }
+
+  /* ================= MAGNETIC FIELD SCENE (home background only) ================= */
+  /* A vertical band holds a magnetic field pointing into the screen (the x marks). Charges fly in from the
+     left: a positive charge bends up, a negative one bends down, on a circle of radius r = v / w. Small
+     circles turn back out the left side; big ones leave on the right. Outside the band they fly straight. */
+  function magnetScene() {
+    const W = 1.6;                                 // turning rate in radians per second (the same for every speed)
+    const s = { w: 0, h: 0, x0: 0, x1: 0, time: 0, parts: [], nextSpawn: 0 };
+
+    s.setSize = (w, h) => {
+      s.w = w; s.h = h;
+      const bw = Math.min(w * 0.3, 420);           // band width
+      s.x0 = w * 0.5; s.x1 = s.x0 + bw;            // left and right edges of the band
+    };
+
+    s.step = (dt) => {
+      s.time += dt;
+      if (s.time >= s.nextSpawn && s.parts.filter((p) => !p.outAt).length < 4) {   // at most four charges flying
+        const bw = s.x1 - s.x0;
+        const r = bw * (0.4 + Math.random() * 1.4);      // radius of the circle it will follow inside the band
+        const q = Math.random() < 0.5 ? 1 : -1;          // sign of the charge
+        s.parts.push({ x: s.x0 - Math.min(s.w * 0.2, 260), y: s.h * (0.42 + Math.random() * 0.2), speed: W * r, ang: 0, q, trail: [], t0: s.time, outAt: 0 });
+        s.nextSpawn = s.time + 1.3 + Math.random() * 0.8;
+      }
+      for (const p of s.parts) {
+        if (p.outAt) continue;                     // already left the screen: only fading
+        const n = Math.ceil(dt / 0.008), h = dt / n;   // tiny sub-steps keep the circle accurate
+        for (let i = 0; i < n; i++) {
+          if (p.x >= s.x0 && p.x <= s.x1) p.ang += (p.q > 0 ? -1 : 1) * W * h;   // inside the field: the direction turns
+          p.x += Math.cos(p.ang) * p.speed * h;
+          p.y += Math.sin(p.ang) * p.speed * h;
+        }
+        p.trail.push([p.x, p.y]);
+        if (p.x < -30 || p.x > s.w + 30 || p.y < -30 || p.y > s.h + 30) p.outAt = s.time;
+      }
+      s.parts = s.parts.filter((p) => !p.outAt || s.time - p.outAt < 2);   // drop faded charges
+    };
+
+    s.draw = (ctx) => {
+      const grid = css("--grid");
+      const base = ctx.globalAlpha;                      // the alpha this scene was given (it changes during a crossfade)
+      ctx.fillStyle = grid; ctx.globalAlpha = base * 0.12;   // the band's faint tint
+      ctx.fillRect(s.x0, 0, s.x1 - s.x0, s.h);
+      ctx.globalAlpha = base;
+      ctx.strokeStyle = grid; ctx.lineWidth = 1.2;
+      ctx.beginPath();                                   // x marks = field pointing into the screen
+      for (let x = s.x0 + 19; x < s.x1; x += 38) {
+        for (let y = 19; y < s.h; y += 38) {
+          ctx.moveTo(x - 4, y - 4); ctx.lineTo(x + 4, y + 4);
+          ctx.moveTo(x + 4, y - 4); ctx.lineTo(x - 4, y + 4);
+        }
+      }
+      ctx.moveTo(s.x0, 0); ctx.lineTo(s.x0, s.h);        // band edges
+      ctx.moveTo(s.x1, 0); ctx.lineTo(s.x1, s.h);
+      ctx.stroke();
+      for (const p of s.parts) {
+        const before = ctx.globalAlpha;
+        const fadeIn = Math.min(1, (s.time - p.t0) / 0.3);
+        const fadeOut = p.outAt ? Math.max(0, 1 - (s.time - p.outAt) / 2) : 1;
+        ctx.globalAlpha = before * fadeIn * fadeOut;
+        const color = css(p.q > 0 ? "--pos" : "--neg");  // red = positive, blue = negative
+        ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.8; ctx.lineCap = "round";
+        ctx.beginPath();
+        p.trail.forEach((t, i) => { if (i === 0) ctx.moveTo(t[0], t[1]); else ctx.lineTo(t[0], t[1]); });
+        ctx.stroke();
+        if (!p.outAt) { ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, 2 * Math.PI); ctx.fill(); }
+        ctx.globalAlpha = before;
       }
     };
     return s;
@@ -373,7 +447,7 @@
     function loop(now) {                           // runs only while a ball is flying
       s.step(Math.min(0.05, (now - last) / 1000)); last = now;
       draw();
-      raf = s.busy() ? requestAnimationFrame(loop) : 0;
+      raf = s.active() ? requestAnimationFrame(loop) : 0;
     }
     const run = () => { if (!raf) { last = performance.now(); raf = requestAnimationFrame(loop); } };
 
@@ -388,6 +462,7 @@
     canvas.addEventListener("pointerdown", (e) => {
       aiming = true;
       s.shots.length = 0;                          // clear the previous shot
+      s.aimAlpha = 1;                              // arrow back to full brightness
       aimFrom(e); draw();
       canvas.setPointerCapture(e.pointerId);
     });
@@ -395,7 +470,7 @@
     canvas.addEventListener("pointerup", () => {   // releasing launches
       if (!aiming) return;
       aiming = false;
-      s.launch(s.aim.v, s.aim.a, true, reduceMotion);   // with reduced motion, show the finished flight at once
+      s.launch(s.aim.v, s.aim.a, reduceMotion);   // with reduced motion, show the finished flight at once
       if (reduceMotion) draw(); else run();
     });
     canvas.addEventListener("pointercancel", () => { aiming = false; });
@@ -410,30 +485,32 @@
     const ctx = canvas.getContext("2d");
     const field = fieldScene({ lines: 14, step: 4, maxSteps: 1200 });  // fewer, coarser lines: cheaper to redraw
     const proj = projectileScene("ambient");
-    const scenes = [field, proj];
+    const mag = magnetScene();
+    const scenes = [field, proj, mag];            // the loop plays these in order
     const SEG = 12, FADE = 1.2;                    // seconds per scene, and length of the crossfade
     let w = 0, h = 0, elapsed = 0, last = 0, raf = 0;
 
     const drawScene = (scene, a) => { ctx.globalAlpha = a; scene.draw(ctx); ctx.globalAlpha = 1; };
     function render() {
       ctx.clearRect(0, 0, w, h);
-      const i = Math.floor(elapsed / SEG) % 2, p = elapsed % SEG;       // which scene, and how far into it
+      const n = scenes.length, i = Math.floor(elapsed / SEG) % n, p = elapsed % SEG;   // which scene, and how far into it
       if (p < FADE && elapsed >= SEG) {            // crossfade from the previous scene
-        drawScene(scenes[1 - i], 1 - p / FADE);
-        drawScene(scenes[i], p / FADE);
+        const f = 1 - Math.pow(1 - p / FADE, 3);   // ease-out: the new scene arrives quickly, then settles
+        drawScene(scenes[(i + n - 1) % n], 1 - f);
+        drawScene(scenes[i], f);
       } else drawScene(scenes[i], 1);
     }
 
     function tick(now) {
       raf = requestAnimationFrame(tick);
-      if (now - last < 33) return;                 // about 30 frames a second is plenty for a backdrop
+      if (now - last < 28) return;                 // about 30 frames a second; 28 (not 33) so a 60 Hz screen gets an even every-other-frame rhythm
       const dt = Math.min(0.1, (now - last) / 1000); last = now;
       elapsed += dt;
-      field.ambient(elapsed); proj.step(dt);
+      field.ambient(elapsed); proj.step(dt); mag.step(dt);
       render();
     }
 
-    const resize = () => { const z = fit(canvas, ctx, 2); w = z.w; h = z.h; field.setSize(w, h); proj.setSize(w, h); render(); };
+    const resize = () => { const z = fit(canvas, ctx, 2); w = z.w; h = z.h; field.setSize(w, h); proj.setSize(w, h); mag.setSize(w, h); render(); };
     new ResizeObserver(resize).observe(canvas);
     resize();
     matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);

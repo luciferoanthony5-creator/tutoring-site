@@ -28,7 +28,7 @@ charge and blue (#2B59FF) means negative charge; use them only where they carry 
 (logo dots, worksheet = red tag, answer key = blue tag, the demos). Demos live in `assets/demos.js`
 and a page picks one with `<canvas data-demo="field|projectile|background">`: the E&M page has the
 interactive field demo, the Mechanics page the interactive projectile launcher (mouse/touch only), and
-the home page a non-interactive full-screen loop of both behind the text (low opacity plus a paper
+the home page a non-interactive full-screen loop of three scenes (field lines, projectiles, a charge entering and leaving a magnetic field) behind the text (low opacity plus a paper
 fade on the left so text stays readable; pauses on a hidden tab; one still frame under reduced
 motion). Lesson pages get a sticky unit outline built by `nav.js`.
 Units are native `<details>` and start expanded. Answer keys are posted openly. One real HTML file

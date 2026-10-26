@@ -59,3 +59,11 @@
 - E&M page now has the interactive field demo above the unit list.
 - Home page: the two-column hero is gone. A fixed full-screen canvas loops field scene (12 s) and projectile scene (12 s) with a 1.2 s crossfade, ~30 fps, pixel density capped at 2, paused on a hidden tab, one still frame under reduced motion. Worst measured text contrast over the animation: 4.99:1 (needs 4.5).
 - Checked all 15 pages at 1280px and 390px in light and dark: no console errors, no horizontal scroll, no broken links.
+
+## 2026-10-25 — Flicker fix, ghost ball removed, magnetic-field scene, `emil-design-eng` pass
+
+- Removed the grey ghost ball from the projectile demo (caption and aria-label updated).
+- Home background flicker: could not reproduce blank frames (canvas brightness changed smoothly), but fixed the likely causes: the 30 fps throttle used a 33 ms threshold that jittered between 33 and 50 ms on a 60 Hz screen (now 28 ms; measured 89 of 90 updates exactly 32 ms apart) and the alpha code multiplied then divided `globalAlpha` (now saved and restored).
+- New third scene in the home loop (field 12 s, projectile 12 s, magnetic 12 s): charges fly into a band of field (x marks = into the screen); positive bends up, negative bends down, radius = speed / turning rate, small circles turn back out the left, big ones leave on the right.
+- Motion polish (`emil-design-eng`): crossfade eased out instead of linear; ambient shots and charges fade in instead of popping; the launch arrow's dim/brighten now eases; crosshair cursor on the launcher (grab stays on the field demo).
+- Worst text contrast over the home animation, magnetic scene included: 5.24:1 (needs 4.5). All 15 pages clean at 1280px and 390px, light and dark.
