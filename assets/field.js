@@ -1,7 +1,9 @@
 /* =====================================================================
    field.js  -  the electric-field demo on the home page.
    Two charges sit on a canvas. Field lines leave the positive charge
-   and end on the negative one. Drag a charge to move it; tap or
+   and end on the negative one (or run off the canvas, which stands in
+   for infinity). Both charges get lines, so the picture is symmetric.
+   Drag a charge to move it; tap or
    double-click it to flip its sign. Keyboard: click the canvas (or Tab
    to it), press 1 or 2 to pick a charge, arrow keys to move it, Enter
    to flip its sign.
@@ -68,9 +70,8 @@
   /* Trace every field line and store it in `lines`. */
   function trace() {
     lines = [];
-    const sign = charges.some((c) => c.q > 0) ? 1 : -1;  // follow the field from positives, or backwards from negatives
-    charges.forEach((c, i) => {
-      if (Math.sign(c.q) !== sign) return;         // start only from the "source" kind of charge
+    charges.forEach((c, i) => {                    // every charge gets its own set of lines
+      const sign = Math.sign(c.q);                 // +1: follow the field outward; -1: follow it backwards (also outward)
       const start = pos(i);
       const count = 18;                            // lines per charge
       for (let k = 0; k < count; k++) {
@@ -78,6 +79,7 @@
         let x = start.x + Math.cos(a) * R;
         let y = start.y + Math.sin(a) * R;
         const pts = [[x, y]];
+        let ended = false;                         // true if the line finishes on a charge of the other sign
         for (let step = 0; step < 1500; step++) {  // take small steps along the field
           const d1 = dir(x, y, sign);
           const dm = dir(x + d1.x * 1.5, y + d1.y * 1.5, sign); // look half a step ahead for accuracy
@@ -90,8 +92,9 @@
             const p = pos(j);
             return Math.hypot(x - p.x, y - p.y) < R;
           });
-          if (hit) break;
+          if (hit) { ended = true; break; }
         }
+        if (ended && sign < 0) continue;           // a line from - that lands on + repeats one drawn from +, so skip it
         lines.push({ pts, sign });
       }
     });

@@ -49,3 +49,4 @@
 - Buttons shrink to 97% while pressed. Unit lists and the lesson outline slide open and shut (`::details-content`, falls back to instant in older browsers). The phone menu fades and drops in 6px.
 - Home demo: charges swell while held and pop when flipped; the intro reveal stops if you grab a charge mid-reveal (was a bug). Keyboard actions stay instant.
 - Reduced motion now removes sliding, rotating and the press shrink but keeps colour fades.
+- Demo fix: field lines now start from both charges (lines from a negative charge that would just repeat one from the positive are skipped), so the dipole is symmetric instead of bare on the negative side.
