@@ -157,8 +157,8 @@ function revealHeadline() {
   h.innerHTML = words
     .map((w, i) => `<span class="w" aria-hidden="true" style="--i:${i}">${esc(w)}</span>`)   // --i = word number, used for the delay in CSS
     .join(" ");                                        // spaces between the spans let the line wrap normally
-  const end = 150 + words.length * 40 + 500;           // ms when the last word has finished fading in (matches CSS)
-  h.closest(".hero").style.setProperty("--after-h", `${end + 200}ms`);   // paragraph and subject rows start 200 ms later
+  const threeQuarters = 150 + Math.round(words.length * 40 * 0.75);   // ms when 3/4 of the words have started (150 and 40 match the CSS)
+  h.closest(".hero").style.setProperty("--after-h", `${threeQuarters}ms`);   // paragraph starts 3/4 of the way through the quote, so there is no long pause
 }
 
 buildMenu();

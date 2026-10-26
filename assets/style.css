@@ -356,11 +356,11 @@ footer a { color: var(--ink-soft); }
   animation-delay: calc(150ms + var(--i) * 40ms);         /* each word starts 40 ms after the one before */
 }
 .home .lede, .home .subject-row {
-  animation: rise 600ms var(--ease-out) backwards;
+  animation: rise 900ms var(--ease-out) backwards;        /* a slower, gentler fade than the quote words */
   animation-delay: var(--after-h, 700ms);                 /* nav.js sets --after-h to when the headline finishes */
 }
-.home .subject-row:nth-child(1) { animation-delay: calc(var(--after-h, 700ms) + 120ms); }   /* subjects follow the paragraph */
-.home .subject-row:nth-child(2) { animation-delay: calc(var(--after-h, 700ms) + 200ms); }
+.home .subject-row:nth-child(1) { animation-delay: calc(var(--after-h, 700ms) + 140ms); }   /* subjects follow the paragraph, one after the other */
+.home .subject-row:nth-child(2) { animation-delay: calc(var(--after-h, 700ms) + 260ms); }
 
 /* Logo dots breathe very slowly on the home page. */
 @keyframes dot-pulse { 50% { transform: scale(1.15); } }
