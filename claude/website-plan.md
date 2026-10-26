@@ -170,7 +170,7 @@ None right now. Earlier questions were answered and moved into sections 4, 5, an
 
 ## 12. Workflow: how edits get made and published
 
-Set up on 2026-09-17. This is the loop for every change from now on.
+Moved to Debian 13 on 2026-10-25. This is the loop for every change from now on.
 
 **Where things live**
 
@@ -178,18 +178,18 @@ Set up on 2026-09-17. This is the loop for every change from now on.
 | --- | --- |
 | GitHub repo | https://github.com/luciferoanthony5-creator/tutoring-site |
 | Live site | https://luciferoanthony5-creator.github.io/tutoring-site/ |
-| Local clone (made by GitHub Desktop) | `C:\Users\lucif\Documents\GitHub\tutoring-site` on the Windows laptop "rogzephyrus" |
-| This plan + a progress log | Claude project "Website" (`claude/website-plan.md`, `claude/progress-log.md`) |
+| Local clone | `~/dev/tutoring-site` on Debian 13 (the only copy) |
+| This plan + progress log | `claude/website-plan.md`, `claude/progress-log.md` in the repo |
 
-The clone folder is the single source of truth. The older copy at `Documents\physics-site` and the downloaded zips are stale and can be deleted.
+The Debian clone is the single source of truth. The old Windows copies (`Documents\GitHub\tutoring-site`, `Documents\physics-site`) are stale and should be deleted.
 
 **The loop**
 
-1. Start a Claude (Cowork) session on the Windows laptop, linked to this computer, with the `Documents` folder added (Claude needs it to reach the clone). Say what to change.
-2. Claude edits or creates files directly inside `Documents\GitHub\tutoring-site`. Claude can create and overwrite files there but cannot delete or rename them; when a file needs deleting, Claude says which one and Anthony deletes it in VS Code or Explorer.
-3. Open GitHub Desktop. The changed files appear in the left panel. Type a one-line summary (e.g. "add lesson 1.4"), click **Commit to main**, then **Push origin**.
-4. About a minute later the live site shows the change. Refresh; if it looks stale, hard-refresh (Ctrl+F5).
-5. Anthony can also edit files himself in VS Code and push the same way; Claude picks up those edits next session because it reads the files from the clone.
+1. `git pull`, then run `claude` inside `~/dev/tutoring-site` and say what to change.
+2. Claude Code edits, creates, renames and deletes files in the repo, and you approve each command.
+3. Test locally: `python3 -m http.server 8000` in the repo, then open http://localhost:8000 (needed for YouTube, which fails from `file://`).
+4. Commit and push: VS Code's Source Control panel, or `git add -A`, `git commit -m "add lesson 1.4"`, `git push`.
+5. About a minute later the live site shows the change. If it looks stale, hard-refresh (Ctrl+Shift+R).
 
 **Adding a lesson** (also in the repo's README.md)
 
@@ -199,9 +199,7 @@ The clone folder is the single source of truth. The older copy at `Documents\phy
 
 Adding a unit: new folder `unit-3` with an `index.html` overview (copy one) and a unit block in `assets/lessons.js`.
 
-**Testing on the laptop**: double-clicking `index.html` works for everything except YouTube (error 153 from a `file://` address). To test videos locally, run `python -m http.server 8000` in the clone folder and open http://localhost:8000. Or just push and check the live site.
-
-**Placeholder PDFs**: made from LaTeX. Sources and `make_pdfs.py` are in `latex-sources/`; run the script (needs pdflatex) to rebuild, or replace the PDFs with real ones and keep the same file names.
+**Placeholder PDFs**: made from LaTeX. Sources and `make_pdfs.py` are in `latex-sources/`; run `python3 latex-sources/make_pdfs.py` (needs `texlive-latex-extra`) to rebuild, or replace the PDFs with real ones and keep the same file names.
 
 **When the custom domain arrives**: follow the README's "Custom domain" section, then change three things: the base URL in `sitemap.xml` and `robots.txt`, and `/tutoring-site/` to `/` in `404.html`.
 
