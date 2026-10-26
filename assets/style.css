@@ -184,6 +184,8 @@ a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 4p
   animation: bg-in 1200ms var(--ease-out) both;          /* one soft fade-in on load */
 }
 @keyframes bg-in { from { opacity: 0; } to { opacity: .55; } }  /* from invisible to its resting opacity */
+.bg-video { object-fit: cover; opacity: .9; animation-name: bg-in-video; }  /* the manim video fills the screen like a CSS background-size: cover; it is already dim, so it can be stronger */
+@keyframes bg-in-video { from { opacity: 0; } to { opacity: .9; } }
 body.home::before {                                      /* paper-coloured fade that sits between the animation and the text */
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background: linear-gradient(to right, var(--paper) 0, color-mix(in srgb, var(--paper) 90%, transparent) 38%, transparent 72%);
