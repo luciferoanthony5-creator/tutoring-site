@@ -20,6 +20,8 @@
   --pos-ink:   #B03A18;        /* positive colour dark enough for text */
   --neg:       #2B59FF;        /* negative charge                      */
   --tint:      #EEEFF8;        /* hover background                     */
+  --ease-out:  cubic-bezier(0.23, 1, 0.32, 1);  /* strong ease-out: fast start, soft landing */
+  interpolate-size: allow-keywords;             /* lets height animate to "auto" (used by the dropdowns) */
 
   --font-read: "Newsreader", Georgia, "Times New Roman", serif;               /* reading text */
   --font-ui:   "Familjen Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif; /* menus, labels */
@@ -66,7 +68,6 @@ h3 { font-size: 1.2rem; }
 p  { margin: 0; }
 
 a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 4px; }  /* links: ink colour, underlined */
-a:hover { color: var(--neg); text-decoration-thickness: 2px; }  /* hover: blue, thicker line */
 :focus-visible { outline: 2px solid var(--neg); outline-offset: 3px; }  /* keyboard focus ring */
 
 /* Skip link: invisible until a keyboard user tabs to it. */
@@ -104,7 +105,6 @@ a:hover { color: var(--neg); text-decoration-thickness: 2px; }  /* hover: blue, 
   margin-right: 24px;
 }
 .brand span { color: var(--ink-soft); font-weight: 400; }  /* the ".com" part */
-.brand:hover { color: var(--ink); }
 
 /* The menu is a nested list: ul > li > ul (units) > li > ul (lessons). */
 .menu, .menu ul { list-style: none; margin: 0; padding: 0; }
@@ -115,7 +115,6 @@ a:hover { color: var(--neg); text-decoration-thickness: 2px; }  /* hover: blue, 
   color: var(--ink); text-decoration: none;
   white-space: nowrap;                         /* keep each item on one line */
 }
-.menu > li > a:hover, .menu > li:hover > a { background: var(--tint); color: var(--ink); }
 
 /* Fly-out level 1 (units): hidden until hovered or focused. */
 .menu ul {
@@ -126,7 +125,6 @@ a:hover { color: var(--neg); text-decoration-thickness: 2px; }  /* hover: blue, 
 }
 .menu li:hover > ul, .menu li:focus-within > ul { display: block; }
 .menu ul li { position: relative; }
-.menu ul a:hover { background: var(--tint); color: var(--ink); }
 .menu ul .menu-label { color: var(--ink-soft); font-size: .9rem; cursor: default; }
 .menu ul .menu-label::after { content: " \203A"; }   /* the little arrow */
 
@@ -170,8 +168,6 @@ a:hover { color: var(--neg); text-decoration-thickness: 2px; }  /* hover: blue, 
   border-bottom: 1px solid var(--line);
   color: var(--ink); text-decoration: none;
 }
-a.subject-row:hover { background: var(--tint); color: var(--ink); }
-a.subject-row:hover h2 { text-decoration: underline; text-underline-offset: 5px; }
 .subject-row .count { font-family: var(--font-ui); color: var(--ink-soft); font-size: .95rem; }
 .subject-row.soon { opacity: .55; }            /* dimmed: not built yet */
 
@@ -182,7 +178,6 @@ a.subject-row:hover h2 { text-decoration: underline; text-underline-offset: 5px;
   background: none; border: 1px solid var(--line);
   padding: 5px 12px; cursor: pointer;
 }
-.unit-controls button:hover { background: var(--tint); }
 
 .unit { border-top: 1px solid var(--line); }
 .unit:last-of-type { border-bottom: 1px solid var(--line); }
@@ -195,11 +190,10 @@ a.subject-row:hover h2 { text-decoration: underline; text-underline-offset: 5px;
 .unit > summary::before {                      /* our own chevron */
   content: ""; width: 9px; height: 9px; flex: none;
   border-right: 2px solid var(--ink-soft); border-bottom: 2px solid var(--ink-soft);
-  transform: rotate(-45deg); transition: transform .15s;
+  transform: rotate(-45deg); transition: transform 150ms var(--ease-out);
 }
 .unit[open] > summary::before { transform: rotate(45deg); }
 .unit > summary a { text-decoration: none; }
-.unit > summary a:hover { text-decoration: underline; }
 .unit .lessons { list-style: none; margin: 0; padding: 0 0 22px 23px; display: grid; gap: 8px; }
 .unit .lessons li.review { font-weight: 600; margin-top: 6px; }
 .unit .lessons .note { color: var(--ink-soft); font-size: .95rem; font-style: italic; }
@@ -228,7 +222,6 @@ a.subject-row:hover h2 { text-decoration: underline; text-underline-offset: 5px;
   border-left: 3px solid transparent;            /* space for the "you are here" bar */
   text-decoration: none; line-height: 1.35;
 }
-.outline li a:hover { background: var(--tint); color: var(--ink); }
 .outline li a[aria-current="page"] {
   border-left-color: var(--neg); font-weight: 600; background: var(--tint);  /* current lesson */
 }
@@ -249,7 +242,6 @@ a.subject-row:hover h2 { text-decoration: underline; text-underline-offset: 5px;
   padding: 14px 4px; border-bottom: 1px solid var(--line);
   color: var(--ink); text-decoration: none;
 }
-.downloads a:hover { background: var(--tint); color: var(--ink); }
 .downloads .pdf {
   font-size: .72rem; font-weight: 700; letter-spacing: .04em;
   border: 1.5px solid currentColor; padding: 2px 6px; flex: none;
@@ -272,13 +264,43 @@ a.subject-row:hover h2 { text-decoration: underline; text-underline-offset: 5px;
   font-family: var(--font-ui); border-top: 1px solid var(--line); padding-top: 20px;
 }
 .prevnext a { text-decoration: none; line-height: 1.35; }
-.prevnext a:hover { text-decoration: underline; }
 .prevnext .next { grid-column: 2; text-align: right; }   /* next link stays on the right */
 
 /* ----- Footer ---------------------------------------------------------- */
 footer { border-top: 1px solid var(--line); color: var(--ink-soft); font-family: var(--font-ui); font-size: .95rem; }
 footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; padding-block: 24px; }
 footer a { color: var(--ink-soft); }
+
+/* ----- Polish: press feedback, mouse-only hover, dropdown motion ------- */
+.menu-btn, .unit-controls button { transition: transform 160ms var(--ease-out), background-color 120ms ease; }  /* what may animate, and how fast */
+.menu-btn:active, .unit-controls button:active { transform: scale(0.97); }  /* buttons shrink slightly while pressed */
+.menu a, .subject-row, .outline li a, .downloads a {
+  transition: background-color 120ms ease, color 120ms ease;      /* hover colour fades instead of snapping */
+}
+
+/* Hover effects only on devices with a real mouse; on touch screens a tap would leave them "stuck". */
+@media (hover: hover) and (pointer: fine) {
+  a:hover { color: var(--neg); text-decoration-thickness: 2px; }  /* links: blue, thicker line */
+  .brand:hover { color: var(--ink); }
+  .menu > li > a:hover, .menu > li:hover > a, .menu ul a:hover { background: var(--tint); color: var(--ink); }
+  a.subject-row:hover { background: var(--tint); color: var(--ink); }
+  a.subject-row:hover h2 { text-decoration: underline; text-underline-offset: 5px; }
+  .unit-controls button:hover { background: var(--tint); }
+  .unit > summary a:hover { text-decoration: underline; }
+  .outline li a:hover, .downloads a:hover { background: var(--tint); color: var(--ink); }
+  .prevnext a:hover { text-decoration: underline; }
+}
+
+/* Unit lists and the lesson outline slide open and shut instead of jumping. */
+.unit::details-content, .outline::details-content {
+  block-size: 0; overflow: clip;                                  /* closed: zero height, content clipped */
+  transition: block-size 220ms var(--ease-out), content-visibility 220ms allow-discrete;  /* animate the height */
+}
+.unit[open]::details-content, .outline[open]::details-content { block-size: auto; }  /* open: natural height */
+
+/* Phone menu fades and drops in 6px. (It closes instantly, which feels quicker.) */
+.menu.open { transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out); }
+@starting-style { .menu.open { opacity: 0; transform: translateY(-6px); } }  /* the look it animates from */
 
 /* ----- Tablets and phones --------------------------------------------- */
 @media (max-width: 900px) {
@@ -310,4 +332,11 @@ footer a { color: var(--ink-soft); }
   .prevnext .next { grid-column: 1; text-align: left; }
 }
 
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }  /* no animation if the visitor asks */
+/* Reduced motion means gentler, not nothing: colour fades stay, sliding and rotating go. */
+@media (prefers-reduced-motion: reduce) {
+  .unit::details-content, .outline::details-content { transition: none; }   /* no height slide */
+  .unit > summary::before { transition: none; }                             /* chevron flips instantly */
+  .menu-btn, .unit-controls button { transition: background-color 120ms ease; }  /* no press shrink */
+  .menu.open { transition: opacity 120ms ease; }                            /* fade only */
+  @starting-style { .menu.open { transform: none; } }                       /* no 6px drop */
+}

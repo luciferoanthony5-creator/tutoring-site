@@ -42,3 +42,10 @@
 - Fixed the empty ad-slot box showing even though it has `hidden`.
 - Checked all 15 pages at 1280px and 390px, light and dark: no horizontal scroll, no broken PDF links. `404.html` only works on GitHub Pages (absolute `/tutoring-site/` paths), so it errors on localhost as before.
 - `.playwright-mcp/` added to `.gitignore`.
+
+## 2026-10-25 — Polish and motion pass (`emil-design-eng`)
+
+- Hover effects now only apply on devices with a mouse (`@media (hover: hover) and (pointer: fine)`), so taps on phones don't leave them stuck.
+- Buttons shrink to 97% while pressed. Unit lists and the lesson outline slide open and shut (`::details-content`, falls back to instant in older browsers). The phone menu fades and drops in 6px.
+- Home demo: charges swell while held and pop when flipped; the intro reveal stops if you grab a charge mid-reveal (was a bug). Keyboard actions stay instant.
+- Reduced motion now removes sliding, rotating and the press shrink but keeps colour fades.

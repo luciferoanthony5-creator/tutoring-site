@@ -26,6 +26,23 @@
   let selected = 0;                                // which charge the keyboard moves
   let dragging = -1;                               // index of the charge being dragged, or -1
   let lastTap = { i: -1, t: 0 };                   // remembers the last press, to spot a double-tap
+  let touched = false;                             // true once the visitor interacts (stops the intro reveal)
+  const scale = [1, 1];                            // current size multiplier of each charge (for press and flip)
+  const tweens = [0, 0];                           // animation-frame ids, one per charge
+
+  /* Ease charge i's size to `to` over `ms` milliseconds (fast start, soft landing). */
+  function tween(i, to, ms) {
+    if (reduceMotion) { scale[i] = to; draw(); return; }   // no animation if the visitor asked
+    cancelAnimationFrame(tweens[i]);               // stop any earlier animation of this charge
+    const from = scale[i], t0 = performance.now();
+    const step = (now) => {
+      const t = Math.min(1, (now - t0) / ms);      // 0 to 1
+      scale[i] = from + (to - from) * (1 - Math.pow(1 - t, 3));  // ease-out curve
+      draw();
+      if (t < 1) tweens[i] = requestAnimationFrame(step);        // keep going until finished
+    };
+    tweens[i] = requestAnimationFrame(step);
+  }
 
   /* Read a colour from the CSS tokens, so dark mode is picked up automatically. */
   const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -112,15 +129,16 @@
     }
     charges.forEach((c, i) => {                    // draw the charges on top
       const p = pos(i);
+      const k = scale[i], r = R * k, bar = 5.5 * k;   // size now, including any press or flip animation
       ctx.beginPath();
-      ctx.arc(p.x, p.y, R, 0, 2 * Math.PI);
+      ctx.arc(p.x, p.y, r, 0, 2 * Math.PI);
       ctx.fillStyle = css(c.q > 0 ? "--pos" : "--neg");   // red = positive, blue = negative
       ctx.fill();
       ctx.strokeStyle = "#FFFFFF";                 // white + or - sign
       ctx.lineWidth = 2.2;
       ctx.beginPath();
-      ctx.moveTo(p.x - 5.5, p.y); ctx.lineTo(p.x + 5.5, p.y);          // the horizontal bar
-      if (c.q > 0) { ctx.moveTo(p.x, p.y - 5.5); ctx.lineTo(p.x, p.y + 5.5); } // the vertical bar (plus only)
+      ctx.moveTo(p.x - bar, p.y); ctx.lineTo(p.x + bar, p.y);          // the horizontal bar
+      if (c.q > 0) { ctx.moveTo(p.x, p.y - bar); ctx.lineTo(p.x, p.y + bar); } // the vertical bar (plus only)
       ctx.stroke();
       if (document.activeElement === canvas && i === selected) {       // ring shows the keyboard choice
         ctx.strokeStyle = css("--ink");
@@ -149,6 +167,7 @@
     if (reduceMotion) { progress = 1; draw(); return; }  // skip the animation if asked
     const t0 = performance.now();
     const frame = (now) => {
+      if (touched) return;                         // visitor already grabbed a charge: stop the intro
       const t = Math.min(1, (now - t0) / 1200);    // 0 to 1 over 1.2 seconds
       progress = 1 - Math.pow(1 - t, 3);           // starts fast, eases out
       draw();
@@ -178,7 +197,7 @@
   }
 
   /* Re-trace and redraw straight away (used while the user is interacting). */
-  function update() { progress = 1; trace(); draw(); }
+  function update() { touched = true; progress = 1; trace(); draw(); }
 
   canvas.addEventListener("pointerdown", (e) => {
     const i = hit(e);
@@ -187,11 +206,14 @@
     if (lastTap.i === i && now - lastTap.t < 350) { // second press within 350 ms = double tap
       charges[i].q *= -1;                          // flip the sign
       lastTap = { i: -1, t: 0 };
+      scale[i] = 0.8;                              // start small ...
       update();
+      tween(i, 1, 180);                            // ... and pop back to full size
       return;
     }
     lastTap = { i, t: now };
     dragging = i; selected = i;
+    tween(i, 1.12, 120);                           // charge swells slightly while held
     canvas.setPointerCapture(e.pointerId);         // keep receiving moves even outside the canvas
   });
 
@@ -200,7 +222,10 @@
     canvas.style.cursor = hit(e) >= 0 ? "grab" : "default"; // hand cursor over a charge
   });
 
-  const release = () => { dragging = -1; };        // let go of the charge
+  const release = () => {                          // let go of the charge
+    if (dragging >= 0) tween(dragging, 1, 160);    // settle back to normal size
+    dragging = -1;
+  };
   canvas.addEventListener("pointerup", release);
   canvas.addEventListener("pointercancel", release);
 
