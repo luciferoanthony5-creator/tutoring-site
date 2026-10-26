@@ -67,3 +67,4 @@
 - New third scene in the home loop (field 12 s, projectile 12 s, magnetic 12 s): charges fly into a band of field (x marks = into the screen); positive bends up, negative bends down, radius = speed / turning rate, small circles turn back out the left, big ones leave on the right.
 - Motion polish (`emil-design-eng`): crossfade eased out instead of linear; ambient shots and charges fade in instead of popping; the launch arrow's dim/brighten now eases; crosshair cursor on the launcher (grab stays on the field demo).
 - Worst text contrast over the home animation, magnetic scene included: 5.24:1 (needs 4.5). All 15 pages clean at 1280px and 390px, light and dark.
+- Magnetic scene: every third charge (starting with the first) is now sized to make a complete half circle inside the band and on screen, then leave back out the left side.

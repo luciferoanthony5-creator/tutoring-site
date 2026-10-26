@@ -261,7 +261,7 @@
      circles turn back out the left side; big ones leave on the right. Outside the band they fly straight. */
   function magnetScene() {
     const W = 1.6;                                 // turning rate in radians per second (the same for every speed)
-    const s = { w: 0, h: 0, x0: 0, x1: 0, time: 0, parts: [], nextSpawn: 0 };
+    const s = { w: 0, h: 0, x0: 0, x1: 0, time: 0, parts: [], nextSpawn: 0, spawned: 0 };
 
     s.setSize = (w, h) => {
       s.w = w; s.h = h;
@@ -273,9 +273,18 @@
       s.time += dt;
       if (s.time >= s.nextSpawn && s.parts.filter((p) => !p.outAt).length < 4) {   // at most four charges flying
         const bw = s.x1 - s.x0;
-        const r = bw * (0.4 + Math.random() * 1.4);      // radius of the circle it will follow inside the band
         const q = Math.random() < 0.5 ? 1 : -1;          // sign of the charge
-        s.parts.push({ x: s.x0 - Math.min(s.w * 0.2, 260), y: s.h * (0.42 + Math.random() * 0.2), speed: W * r, ang: 0, q, trail: [], t0: s.time, outAt: 0 });
+        let r, y;
+        if (s.spawned % 3 === 0) {                       // every third charge (starting with the first) makes a full half circle
+          r = Math.min(bw * (0.35 + Math.random() * 0.25), s.h * 0.2);   // small enough to fit inside the band and on screen
+          y = q > 0 ? 2 * r + s.h * (0.12 + Math.random() * 0.1)         // positive bends up, so start low enough for the whole arc
+                    : s.h * 0.85 - 2 * r - s.h * Math.random() * 0.1;    // negative bends down, so start high enough
+        } else {
+          r = bw * (0.4 + Math.random() * 1.4);          // any size: may turn back or sweep out the right side
+          y = s.h * (0.42 + Math.random() * 0.2);
+        }
+        s.spawned++;                                     // count charges so we know when the next half circle is due
+        s.parts.push({ x: s.x0 - Math.min(s.w * 0.2, 260), y, speed: W * r, ang: 0, q, trail: [], t0: s.time, outAt: 0 });
         s.nextSpawn = s.time + 1.3 + Math.random() * 0.8;
       }
       for (const p of s.parts) {
