@@ -34,3 +34,11 @@
 - Plan and progress log now live in the repo under `claude/`. Section 12 of the plan describes the new workflow.
 - Added `CLAUDE.md`. Verified locally: pages and PDFs serve (200) and `make_pdfs.py` builds all PDFs with pdflatex.
 - Left for Anthony: install the frontend-design plugin, delete the old Windows clones, update the "Website" Claude project with these copies.
+
+## 2026-10-25 — Front-end rewrite ("Field Lines, drawn live")
+
+- Rebuilt the look with the `frontend-design` skill only. New fonts (Newsreader, Familjen Grotesk), indigo/near-white palette, red = positive charge, blue = negative charge. Old Plex/blue style A is gone.
+- New: `assets/field.js` (draggable field-line demo on the home page), sticky unit outline on lesson pages (built in `nav.js`), skip link, inline favicon (fixes the `favicon.ico` 404). Removed the all-caps eyebrow labels and the subject cards.
+- Fixed the empty ad-slot box showing even though it has `hidden`.
+- Checked all 15 pages at 1280px and 390px, light and dark: no horizontal scroll, no broken PDF links. `404.html` only works on GitHub Pages (absolute `/tutoring-site/` paths), so it errors on localhost as before.
+- `.playwright-mcp/` added to `.gitignore`.

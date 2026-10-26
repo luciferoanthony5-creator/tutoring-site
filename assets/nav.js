@@ -102,15 +102,35 @@ function buildPrevNext() {
     l.unit.folder === body.dataset.unit &&
     l.slug === body.dataset.lesson);
   if (i < 0) return;                              // page not in lessons.js
-  const me = ALL[i], prev = ALL[i - 1], next = ALL[i + 1];
-  const link = (l) => `<a href="${lessonPath(l.subject, l.unit, l)}">`;
-  const html = `
-    <span>${prev ? `${link(prev)}&larr; ${esc(prev.title)}</a>` : `<span class="off">&larr; Start of list</span>`}</span>
-    <span class="center"><a href="${ROOT}${me.subject.slug}/index.html">${esc(me.subject.title)}</a> &middot; Unit ${me.unit.number}</span>
-    <span class="next">${next ? `${link(next)}${esc(next.title)} &rarr;</a>` : `<span class="off">End of list &rarr;</span>`}</span>`;
+  const prev = ALL[i - 1], next = ALL[i + 1];      // neighbours in the flattened list
+  const link = (l, cls, text) =>                   // builds one <a> (empty string if there is no lesson)
+    l ? `<a class="${cls}" href="${lessonPath(l.subject, l.unit, l)}">${text}</a>` : "";
+  const html = link(prev, "prev", `&larr; ${esc(prev?.title ?? "")}`) +   // ?. and ?? avoid errors when prev is missing
+               link(next, "next", `${esc(next?.title ?? "")} &rarr;`);
   for (const bar of bars) bar.innerHTML = html;
+}
+
+/* --- Lesson page: outline of the current unit (left column) ----------- */
+function buildOutline() {
+  const wrap = document.querySelector(".page > .wrap");   // the content wrapper
+  const subject = SUBJECTS.find((s) => s.slug === body.dataset.subject);
+  const unit = subject?.units.find((u) => u.folder === body.dataset.unit);
+  if (!wrap || !unit || !body.dataset.lesson) return;     // only lesson pages have these attributes
+  const items = unit.lessons.map((lesson) => {
+    const current = lesson.slug === body.dataset.lesson;  // is this the page we are on?
+    return `<li><a href="${lessonPath(subject, unit, lesson)}"${current ? ' aria-current="page"' : ""}>${esc(lesson.title)}</a></li>`;
+  }).join("");
+  const aside = document.createElement("details");        // a collapsible box: open on desktop, closed on phones
+  aside.className = "outline";
+  aside.open = !matchMedia("(max-width: 900px)").matches;
+  aside.innerHTML = `<summary>Unit ${unit.number}: ${esc(unit.title)}</summary><ul>${items}</ul>` +
+    `<a class="all-link" href="${ROOT}${subject.slug}/index.html">All ${esc(subject.title)} lessons</a>`;
+  wrap.classList.add("lesson-layout");                    // switches on the two-column layout in style.css
+  wrap.prepend(aside);                                    // put the outline first inside the wrapper
+  aside.style.gridRow = `1 / span ${wrap.children.length - 1}`;  // let it run alongside the other rows
 }
 
 buildMenu();
 buildUnitList();
 buildPrevNext();
+buildOutline();
