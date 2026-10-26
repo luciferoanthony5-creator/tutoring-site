@@ -134,7 +134,35 @@ function buildOutline() {
   aside.style.gridRow = `1 / span ${wrap.children.length - 1}`;  // let it run alongside the other rows
 }
 
+/* --- Esc closes the open menu ----------------------------------------- */
+document.addEventListener("keydown", (e) => {          // runs on every key press
+  if (e.key !== "Escape") return;                      // ignore every key except Esc
+  const menu = $("menu");
+  if (menu.contains(document.activeElement)) {         // focus is inside the menu
+    document.activeElement.blur();                     // drop focus: the :focus-within fly-out closes
+    if (menu.classList.contains("open")) {             // phone menu panel
+      menu.classList.remove("open");
+      $("menu-btn").setAttribute("aria-expanded", "false");
+      $("menu-btn").focus();                           // put the keyboard back on the Menu button
+    }
+  }
+});
+
+/* --- Home page: fade the headline in word by word ---------------------- */
+function revealHeadline() {
+  const h = document.querySelector("h1.reveal");
+  if (!h || matchMedia("(prefers-reduced-motion: reduce)").matches) return;   // reduced motion: leave the text plain
+  const words = h.textContent.trim().split(/\s+/);     // "a b c" -> ["a","b","c"]
+  h.setAttribute("aria-label", words.join(" "));       // screen readers read the whole sentence, not word fragments
+  h.innerHTML = words
+    .map((w, i) => `<span class="w" aria-hidden="true" style="--i:${i}">${esc(w)}</span>`)   // --i = word number, used for the delay in CSS
+    .join(" ");                                        // spaces between the spans let the line wrap normally
+  const end = 150 + words.length * 40 + 500;           // ms when the last word has finished fading in (matches CSS)
+  h.closest(".hero").style.setProperty("--after-h", `${end + 200}ms`);   // paragraph and subject rows start 200 ms later
+}
+
 buildMenu();
+revealHeadline();
 buildUnitList();
 buildPrevNext();
 buildOutline();

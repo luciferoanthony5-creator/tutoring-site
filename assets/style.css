@@ -43,6 +43,22 @@
   }
 }
 
+/* Home page only: true black. Same token names, so every rule below just works;
+   these are the dark-mode values pushed to black, whatever the system setting is. */
+body.home {
+  --paper:    #000000;           /* page background */
+  --surface:  #0A0A10;           /* header, menus */
+  --ink:      #F2F3FF;           /* main text */
+  --ink-soft: #A9ADD0;           /* secondary text (about 9:1 on black) */
+  --line:     #26283F;           /* borders and rules */
+  --pos:      #FF7A55;
+  --pos-ink:  #FF9477;
+  --neg:      #7C9BFF;
+  --tint:     #14152A;           /* hover background */
+}
+html:has(body.home) { background: #000; }       /* the black lives on <html>, so it stays behind the background animation */
+body.home { background: transparent; }          /* body must not paint its own black over the animation (z-index -2) */
+
 /* ----- Base page ------------------------------------------------------- */
 * { box-sizing: border-box; }                 /* padding counts inside width */
 html, body { margin: 0; }                      /* remove the browser's default margin */
@@ -116,14 +132,19 @@ a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 4p
   white-space: nowrap;                         /* keep each item on one line */
 }
 
-/* Fly-out level 1 (units): hidden until hovered or focused. */
+/* Fly-out level 1 (units): hidden until hovered or focused. It is not display:none, because
+   display can't be animated; visibility + opacity + a 6px offset can. */
 .menu ul {
-  display: none;
+  visibility: hidden; opacity: 0; transform: translateY(-6px); transform-origin: top left;   /* hidden, nudged up */
+  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out), visibility 0s linear 180ms;  /* visibility flips after the fade ends */
   position: absolute; top: 100%; left: 0; min-width: 260px;
   background: var(--surface); border: 1px solid var(--line);
   padding: 6px;
 }
-.menu li:hover > ul, .menu li:focus-within > ul { display: block; }
+.menu li:hover > ul, .menu li:focus-within > ul {
+  visibility: visible; opacity: 1; transform: none;   /* shown: fades in and drops into place */
+  transition-delay: 0s;                               /* visibility flips at once when opening */
+}
 .menu ul li { position: relative; }
 .menu ul .menu-label { color: var(--ink-soft); font-size: .9rem; cursor: default; }
 .menu ul .menu-label::after { content: " \203A"; }   /* the little arrow */
@@ -146,8 +167,13 @@ a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 4p
 .prose { max-width: 62ch; display: grid; gap: 16px; }
 
 /* Home page: one column of text; the animation fills the screen behind it. */
-.hero > div { max-width: 540px; }                        /* keeps the text in a left column */
-.hero h1 { font-size: clamp(2.6rem, 6vw, 4.6rem); }      /* the big home headline */
+.hero > div { max-width: 620px; }                        /* keeps the text in a left column */
+.hero h1 {                                               /* the home quote: long, so smaller than a one-line tagline */
+  font-size: clamp(1.95rem, 4.4vw, 3.2rem);
+  font-style: italic; font-weight: 400;                  /* Newsreader italic reads like a quotation */
+  line-height: 1.18;
+}
+.hero h1 .w { display: inline-block; }                   /* nav.js wraps each word; inline-block lets it move */
 .page { min-height: calc(100vh - 140px); }               /* page fills the screen so the animation has room */
 
 .bg-demo {
@@ -307,6 +333,41 @@ footer a { color: var(--ink-soft); }
   .prevnext a:hover { text-decoration: underline; }
 }
 
+/* Top-level menu items: a thin underline slides in from the left on hover and keyboard focus. */
+.menu > li > a { position: relative; }                 /* anchor for the underline */
+.menu > li > a::after {
+  content: ""; position: absolute; left: 12px; right: 12px; bottom: 4px;   /* 12px = the link's side padding */
+  height: 1px; background: currentColor;
+  transform: scaleX(0); transform-origin: left center;                    /* collapsed against the left edge */
+  transition: transform 220ms var(--ease-out);
+}
+.menu > li > a:focus-visible::after { transform: scaleX(1); }              /* keyboard focus shows it too */
+@media (hover: hover) and (pointer: fine) {
+  .menu > li:hover > a::after { transform: scaleX(1); }                    /* stays while the dropdown is open */
+}
+
+/* Home page entrance: words of the quote, then the paragraph, then the subjects. All play once. */
+@keyframes word-in { from { opacity: 0; transform: translateY(12px); } }   /* "from" only: it ends at the normal style */
+@keyframes rise    { from { opacity: 0; transform: translateY(10px); } }
+.hero h1 .w {
+  animation: word-in 500ms var(--ease-out) backwards;     /* backwards = hidden during the delay */
+  animation-delay: calc(150ms + var(--i) * 40ms);         /* each word starts 40 ms after the one before */
+}
+.home .lede, .home .subject-row {
+  animation: rise 600ms var(--ease-out) backwards;
+  animation-delay: var(--after-h, 700ms);                 /* nav.js sets --after-h to when the headline finishes */
+}
+.home .subject-row:nth-child(1) { animation-delay: calc(var(--after-h, 700ms) + 120ms); }   /* subjects follow the paragraph */
+.home .subject-row:nth-child(2) { animation-delay: calc(var(--after-h, 700ms) + 200ms); }
+
+/* Logo dots breathe very slowly on the home page. */
+@keyframes dot-pulse { 50% { transform: scale(1.15); } }
+body.home .brand::before { animation: dot-pulse 5s ease-in-out infinite; }
+
+@media (hover: hover) and (pointer: fine) {
+  a.subject-row:hover .count { color: var(--ink); }       /* the small description brightens with the row */
+}
+
 /* Unit lists and the lesson outline slide open and shut instead of jumping. */
 .unit::details-content, .outline::details-content {
   block-size: 0; overflow: clip;                                  /* closed: zero height, content clipped */
@@ -338,7 +399,8 @@ footer a { color: var(--ink-soft); }
   }
   .menu.open { display: flex; }                  /* nav.js adds class "open" */
   .menu ul, .menu li:hover > ul, .menu li:focus-within > ul {
-    display: block; position: static;            /* no fly-outs: just indent */
+    visibility: visible; opacity: 1; transform: none; transition: none;   /* always shown, no animation */
+    position: static;                            /* no fly-outs: just indent */
     border: 0; min-width: 0; padding: 0 0 0 16px;
   }
   .menu ul ul { padding-left: 16px; }
@@ -355,5 +417,8 @@ footer a { color: var(--ink-soft); }
   .menu-btn, .unit-controls button { transition: background-color 120ms ease; }  /* no press shrink */
   .menu.open { transition: opacity 120ms ease; }                            /* fade only */
   .bg-demo { animation: none; }                                             /* background appears without fading in */
+  .hero h1 .w, .home .lede, .home .subject-row, body.home .brand::before { animation: none; }  /* no entrance, no pulse */
+  .menu ul { transform: none; transition: opacity 120ms ease, visibility 0s linear 120ms; }     /* dropdown fades only */
+  .menu > li > a::after { transition: none; }                               /* underline appears without sliding */
   @starting-style { .menu.open { transform: none; } }                       /* no 6px drop */
 }
