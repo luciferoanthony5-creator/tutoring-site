@@ -50,3 +50,12 @@
 - Home demo: charges swell while held and pop when flipped; the intro reveal stops if you grab a charge mid-reveal (was a bug). Keyboard actions stay instant.
 - Reduced motion now removes sliding, rotating and the press shrink but keeps colour fades.
 - Demo fix: field lines now start from both charges (lines from a negative charge that would just repeat one from the positive are skipped), so the dipole is symmetric instead of bare on the negative side.
+
+## 2026-10-25 — Mechanics page, demos on subject pages, home background loop (`frontend-design`)
+
+- New `assets/demos.js` replaces `field.js`: a field scene, a projectile scene, and three hosts chosen by `<canvas data-demo="...">` (`field`, `projectile`, `background`).
+- New `mechanics/index.html` with an interactive projectile launcher (press and drag to aim, release to launch; red ball with gravity, grey dashed ghost ball without; dots every 0.25 s). Anthony chose no Launch button, no peak/landing marks or readouts, and no keyboard controls, so the launcher is mouse/touch only.
+- Mechanics added to `lessons.js` with `units: []`; `nav.js` now copes with a subject that has no units. Added to the home page (real link, no more "Coming later") and `sitemap.xml`.
+- E&M page now has the interactive field demo above the unit list.
+- Home page: the two-column hero is gone. A fixed full-screen canvas loops field scene (12 s) and projectile scene (12 s) with a 1.2 s crossfade, ~30 fps, pixel density capped at 2, paused on a hidden tab, one still frame under reduced motion. Worst measured text contrast over the animation: 4.99:1 (needs 4.5).
+- Checked all 15 pages at 1280px and 390px in light and dark: no console errors, no horizontal scroll, no broken links.

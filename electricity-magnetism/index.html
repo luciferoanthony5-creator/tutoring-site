@@ -28,6 +28,12 @@
       <h1>Electricity &amp; Magnetism</h1>
       <p class="lede">Each unit opens with a conceptual overview video. The numbered lessons are worked example problems, each with a printable worksheet and full solutions.</p>
     </div>
+    <!-- The field demo. assets/demos.js draws on this canvas. -->
+    <figure class="demo wide">
+      <canvas data-demo="field" tabindex="0" role="img"
+              aria-label="Electric field lines between a positive and a negative charge. Press 1 or 2 to choose a charge, the arrow keys to move it, and Enter to flip its sign."></canvas>
+      <figcaption>Drag the charges. Double-click one to flip its sign.</figcaption>
+    </figure>
     <div class="unit-controls">
       <button type="button" id="expand-all">Expand all</button>
       <button type="button" id="collapse-all">Collapse all</button>
@@ -50,5 +56,6 @@
 <!-- lessons.js = the list of subjects/units/lessons; nav.js builds menus from it -->
 <script src="../assets/lessons.js"></script>
 <script src="../assets/nav.js"></script>
+<script src="../assets/demos.js"></script>
 </body>
 </html>

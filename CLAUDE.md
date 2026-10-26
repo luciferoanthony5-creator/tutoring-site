@@ -10,7 +10,8 @@ Read `claude/website-plan.md` before larger changes; `claude/progress-log.md` ha
 - `index.html`, `about.html`, `privacy.html`, `404.html`
 - `electricity-magnetism/index.html` (subject page), `unit-N/` with `index.html` overview,
   `N-M-topic.html` lessons, and `N-M-worksheet.pdf` / `N-M-solutions.pdf`
-- `assets/style.css`, `assets/nav.js` (menu, unit list, unit outline, prev/next), `assets/field.js` (home-page demo), `assets/lessons.js` (the one list of lessons)
+- `assets/style.css`, `assets/nav.js` (menu, unit list, unit outline, prev/next), `assets/demos.js` (all physics demos), `assets/lessons.js` (the one list of lessons)
+- `mechanics/index.html` (subject page; no units yet, so `units: []` in `lessons.js`)
 - `latex-sources/` with `make_pdfs.py` to rebuild placeholder PDFs (`python3 latex-sources/make_pdfs.py`, needs pdflatex)
 
 ## Adding a lesson
@@ -24,8 +25,12 @@ that unit's `lessons` list in `assets/lessons.js`. Adding a unit: new `unit-N` f
 Newsreader serif for reading and headings, Familjen Grotesk for menus and labels, deep indigo ink
 #1B1F4B on near-white paper #FAFAFC, dark mode follows system setting. Red (#E4572E) means positive
 charge and blue (#2B59FF) means negative charge; use them only where they carry that meaning
-(logo dots, worksheet = red tag, answer key = blue tag, the home-page demo). The home page has a
-live field-line demo (`assets/field.js`); lesson pages get a sticky unit outline built by `nav.js`.
+(logo dots, worksheet = red tag, answer key = blue tag, the demos). Demos live in `assets/demos.js`
+and a page picks one with `<canvas data-demo="field|projectile|background">`: the E&M page has the
+interactive field demo, the Mechanics page the interactive projectile launcher (mouse/touch only), and
+the home page a non-interactive full-screen loop of both behind the text (low opacity plus a paper
+fade on the left so text stays readable; pauses on a hidden tab; one still frame under reduced
+motion). Lesson pages get a sticky unit outline built by `nav.js`.
 Units are native `<details>` and start expanded. Answer keys are posted openly. One real HTML file
 per lesson. Don't restyle existing pages without being asked.
 

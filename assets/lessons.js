@@ -52,5 +52,11 @@ const SUBJECTS = [
       },
     ],
   },
-  // A second subject goes here as another { ... } block.
+  {
+    slug: "mechanics",                       // folder name
+    title: "Mechanics",
+    short: "Mechanics",                      // menu label
+    units: [],                               // no lessons yet; add unit blocks here later
+  },
+  // A further subject goes here as another { ... } block.
 ];

@@ -43,6 +43,10 @@ if ($("footer-name")) $("footer-name").textContent = `© ${new Date().getFullYea
 function buildMenu() {
   let html = `<li><a href="${ROOT}index.html">Home</a></li>`;
   for (const subject of SUBJECTS) {
+    if (!subject.units.length) {                   // a subject with no lessons yet: plain link, no fly-out
+      html += `<li><a href="${ROOT}${subject.slug}/index.html">${esc(subject.short)}</a></li>`;
+      continue;                                    // skip to the next subject
+    }
     html += `<li><a href="${ROOT}${subject.slug}/index.html">${esc(subject.short)}</a><ul>`;
     for (const unit of subject.units) {
       html += `<li><span class="menu-label" tabindex="0">Unit ${unit.number}: ${esc(unit.title)}</span><ul>`;
@@ -66,7 +70,7 @@ $("menu-btn").addEventListener("click", () => {
 /* --- Subject page: list of units ------------------------------------- */
 function buildUnitList() {
   const subject = SUBJECTS.find((s) => s.slug === body.dataset.subject);
-  if (!subject || !$("unit-list")) return;
+  if (!subject || !$("unit-list") || !subject.units.length) return;   // nothing to list yet
   let html = "";
   for (const unit of subject.units) {
     const overview = unit.lessons.find((l) => l.overview);

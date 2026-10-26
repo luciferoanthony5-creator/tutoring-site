@@ -145,13 +145,28 @@ a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 4p
 .lede { color: var(--ink-soft); max-width: 52ch; margin-top: 14px; font-size: 1.2rem; }
 .prose { max-width: 62ch; display: grid; gap: 16px; }
 
-/* Home page: text on the left, field demo on the right. */
-.page > .wrap.hero {
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);  /* two columns */
-  column-gap: 64px; align-items: start;
-}
+/* Home page: one column of text; the animation fills the screen behind it. */
+.hero > div { max-width: 540px; }                        /* keeps the text in a left column */
 .hero h1 { font-size: clamp(2.6rem, 6vw, 4.6rem); }      /* the big home headline */
-.demo { margin: 0; display: grid; gap: 12px; }           /* the figure holding the canvas */
+.page { min-height: calc(100vh - 140px); }               /* page fills the screen so the animation has room */
+
+.bg-demo {
+  position: fixed; inset: 0; z-index: -2;                /* pinned to the screen, behind everything */
+  width: 100%; height: 100%;
+  opacity: .55;                                          /* low contrast so text stays readable */
+  pointer-events: none;                                  /* clicks pass straight through */
+  animation: bg-in 1200ms var(--ease-out) both;          /* one soft fade-in on load */
+}
+@keyframes bg-in { from { opacity: 0; } to { opacity: .55; } }  /* from invisible to its resting opacity */
+body.home::before {                                      /* paper-coloured fade that sits between the animation and the text */
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(to right, var(--paper) 0, color-mix(in srgb, var(--paper) 90%, transparent) 38%, transparent 72%);
+}
+body.home footer { background: var(--paper); position: relative; }  /* footer stays solid so its text is readable */
+
+.demo { margin: 0; display: grid; gap: 12px; }           /* the figure holding a canvas */
+.demo.wide { max-width: 760px; }                         /* demos on the subject pages */
+.demo.wide canvas { aspect-ratio: 16 / 9; }              /* wider shape than the default */
 .demo canvas {
   width: 100%; aspect-ratio: 5 / 4; display: block;      /* fixed shape at any width */
   background: var(--surface); border: 1px solid var(--line);
@@ -304,7 +319,6 @@ footer a { color: var(--ink-soft); }
 
 /* ----- Tablets and phones --------------------------------------------- */
 @media (max-width: 900px) {
-  .page > .wrap.hero { grid-template-columns: minmax(0, 1fr); row-gap: 40px; }  /* demo drops below the text */
   .page > .wrap.lesson-layout { grid-template-columns: minmax(0, 1fr); }        /* one column */
   .lesson-layout > * { grid-column: 1; }
   .lesson-layout > .outline { grid-row: auto !important; order: 99; position: static; }  /* outline moves to the end */
@@ -313,6 +327,7 @@ footer a { color: var(--ink-soft); }
 @media (max-width: 720px) {
   .wrap { padding-inline: 16px; }                /* narrower gutter on phones */
   .page { padding-block: 32px 64px; }
+  body.home::before { background: color-mix(in srgb, var(--paper) 72%, transparent); }  /* on a phone the text spans the screen, so veil it all */
   .menu-btn { display: inline-block; }
   .menu {                                        /* menu becomes a stacked panel */
     display: none; position: absolute; top: 100%; left: 0; right: 0;
@@ -338,5 +353,6 @@ footer a { color: var(--ink-soft); }
   .unit > summary::before { transition: none; }                             /* chevron flips instantly */
   .menu-btn, .unit-controls button { transition: background-color 120ms ease; }  /* no press shrink */
   .menu.open { transition: opacity 120ms ease; }                            /* fade only */
+  .bg-demo { animation: none; }                                             /* background appears without fading in */
   @starting-style { .menu.open { transform: none; } }                       /* no 6px drop */
 }
