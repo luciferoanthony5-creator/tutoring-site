@@ -12,6 +12,7 @@ Read `claude/website-plan.md` before larger changes; `claude/progress-log.md` ha
   `N-M-topic.html` lessons, and `N-M-worksheet.pdf` / `N-M-solutions.pdf`
 - `assets/style.css`, `assets/nav.js` (menu, unit list, unit outline, prev/next), `assets/demos.js` (all physics demos), `assets/lessons.js` (the one list of lessons)
 - `mechanics/index.html` (subject page; no units yet, so `units: []` in `lessons.js`)
+- `assets/video/` (home background: `home-loop.webm`, `home-loop.mp4`, `home-loop-poster.jpg`) and `manim-sources/` (`scene.py` draws it, `render.py` rebuilds it: `python3 manim-sources/render.py`, needs manim + ffmpeg)
 - `latex-sources/` with `make_pdfs.py` to rebuild placeholder PDFs (`python3 latex-sources/make_pdfs.py`, needs pdflatex)
 
 ## Adding a lesson
@@ -26,11 +27,15 @@ Newsreader serif for reading and headings, Familjen Grotesk for menus and labels
 #1B1F4B on near-white paper #FAFAFC, dark mode follows system setting. Red (#E4572E) means positive
 charge and blue (#2B59FF) means negative charge; use them only where they carry that meaning
 (logo dots, worksheet = red tag, answer key = blue tag, the demos). Demos live in `assets/demos.js`
-and a page picks one with `<canvas data-demo="field|projectile|background">`: the E&M page has the
-interactive field demo, the Mechanics page the interactive projectile launcher (mouse/touch only), and
-the home page a non-interactive full-screen loop of three scenes (field lines, projectiles, a charge entering and leaving a magnetic field) behind the text (low opacity plus a paper
-fade on the left so text stays readable; pauses on a hidden tab; one still frame under reduced
-motion). Lesson pages get a sticky unit outline built by `nav.js`.
+and a page picks one with `<canvas data-demo="field|projectile">`: the E&M page has the
+interactive field demo and the Mechanics page the interactive projectile launcher (mouse/touch only).
+The home page is different: true black (tokens overridden on `body.home`, home only; `body.home` must stay
+transparent or it hides the video) with the quote as the `<h1>` and a full-screen manim video loop behind the text
+(particles entering a magnetic field, every third a half circle, cross-fading with a swinging pendulum in neutral
+white; a paper-coloured scrim fades the left so text stays readable; pauses on a hidden tab; only the poster still
+under reduced motion). On load the quote fades in word by word, then the paragraph (starts 3/4 through the quote)
+and subject rows; logo dots pulse slowly. Menu dropdowns fade and drop in and Esc closes them (all pages).
+Lesson pages get a sticky unit outline built by `nav.js`.
 Units are native `<details>` and start expanded. Answer keys are posted openly. One real HTML file
 per lesson. Don't restyle existing pages without being asked.
 

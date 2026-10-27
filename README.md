@@ -11,6 +11,10 @@ about.html  privacy.html  404.html
 assets/style.css                   all styling (colours at the top)
 assets/lessons.js                  THE list of subjects / units / lessons
 assets/nav.js                      builds the menu, unit list, prev/next from that list
+assets/demos.js                    the physics demos (field, projectile)
+assets/video/                      home-page background loop (made by manim-sources/)
+manim-sources/                     scene.py + render.py: python3 manim-sources/render.py (needs manim, ffmpeg)
+mechanics/index.html               subject page (no lessons yet)
 electricity-magnetism/index.html   subject page
 electricity-magnetism/unit-1/      one .html per lesson + that unit's PDFs
 electricity-magnetism/unit-2/

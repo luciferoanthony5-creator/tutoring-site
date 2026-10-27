@@ -64,7 +64,8 @@ Subject-specific note (Electricity & Magnetism only; other subjects may differ):
 | First subject | Electricity & Magnetism |
 | Level of first subject | AP Physics C: Electricity and Magnetism / intro college, calculus-based |
 | Site name and domain | `AntsPhysicsLessons.com` is a placeholder; real name to be decided by Anthony, probably during production |
-| Colors and fonts | Chosen: option A "Field Lines" – IBM Plex Serif headings, IBM Plex Sans body, blue accent (#1F5FD1), cool light-grey paper; dark mode follows the visitor's system setting |
+| Colors and fonts | "Field Lines, drawn live" (replaced the old Plex/blue style A on 2026-10-25): Newsreader serif for reading and headings, Familjen Grotesk for menus and labels, indigo ink #1B1F4B on near-white paper #FAFAFC, red = positive charge, blue = negative charge; dark mode follows the visitor's system setting. Exception: the home page is always true black. |
+| Home page | Black, the quote as the headline, and a manim video loop behind it (magnetic-field particles and a pendulum); word-by-word entrance. Details in `CLAUDE.md` and `progress-log.md` (2026-10-26) |
 | Prototype unit and lesson titles | Placeholders |
 | Videos per lesson | One |
 | AdSense timing | Apply after one full subject is live |
@@ -83,6 +84,10 @@ Reasoning for this approach: plain files with nothing proprietary in the way giv
 /electricity-magnetism/unit-1/1-1-solutions.pdf
 /assets/style.css
 /assets/nav.js
+/assets/demos.js            physics demos (E&M field, Mechanics projectile)
+/assets/video/              home background loop (webm, mp4, poster), made by /manim-sources/
+/manim-sources/             scene.py + render.py (python3 manim-sources/render.py)
+/mechanics/index.html       second subject page (no lessons yet)
 /assets/lessons.js          single list of subjects / units / lessons
 /about.html
 /privacy.html
