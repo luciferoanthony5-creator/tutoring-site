@@ -201,9 +201,11 @@ function buildOutline() {
 
 /* --- Esc closes the open menu ----------------------------------------- */
 document.addEventListener("keydown", (e) => {          // runs on every key press
-  if (e.key !== "Escape") return;                      // ignore every key except Esc
   const menu = $("menu");
   const inMenu = menu.contains(document.activeElement);   // is the keyboard focus inside the menu?
+  if (e.key === "Tab" && inMenu) skipMotion(menu);     // Tab is about to move focus away: let the fly-outs close with no fade or wait
+  if (e.key !== "Escape") return;                      // ignore every other key
+  skipMotion(menu);                                    // Esc is a keyboard action: the fly-outs close at once
   if (inMenu) document.activeElement.blur();           // drop focus: the :focus-within fly-out closes
   if (menu.classList.contains("open")) {               // phone menu panel is open (focus on its button, inside it, or elsewhere)
     setPhoneMenu(false, true);                         // close it at once: Esc is a keyboard action
