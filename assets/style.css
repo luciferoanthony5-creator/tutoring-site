@@ -136,21 +136,23 @@ a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 4p
    display can't be animated; visibility + opacity + a 6px offset can. */
 .menu ul {
   visibility: hidden; opacity: 0; transform: translateY(-6px); transform-origin: top left;   /* hidden, nudged up */
-  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out), visibility 0s linear 180ms;  /* visibility flips after the fade ends */
+  transition: opacity 120ms var(--ease-out) 80ms, transform 120ms var(--ease-out) 80ms, visibility 0s linear 200ms;  /* closing: wait 80ms (a slip of the mouse doesn't flicker it), fade 120ms, then hide */
   position: absolute; top: 100%; left: 0; min-width: 260px;
   background: var(--surface); border: 1px solid var(--line);
   padding: 6px;
 }
 .menu li:hover > ul, .menu li:focus-within > ul {
   visibility: visible; opacity: 1; transform: none;   /* shown: fades in and drops into place */
-  transition-delay: 0s;                               /* visibility flips at once when opening */
+  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out), visibility 0s;  /* opening: no wait, a touch slower than closing */
 }
 .menu ul li { position: relative; }
 .menu ul .menu-label { color: var(--ink-soft); font-size: .9rem; cursor: default; }
 .menu ul .menu-label::after { content: " \203A"; }   /* the little arrow */
 
-/* Fly-out level 2 (lessons): opens to the right of the unit. */
-.menu ul ul { top: -7px; left: 100%; }
+/* Fly-out level 2 (lessons): opens to the LEFT of the unit (the menu sits at the right edge of the header,
+   so a list opening rightward ran off the screen and made the page scroll sideways). It slides in from the unit. */
+.menu ul ul { top: -7px; left: auto; right: 100%; transform: translateX(6px); width: max-content; max-width: 380px; }   /* as wide as its longest title, up to 380px (more would run off the left edge on a narrow desktop window) */
+.menu ul ul a { white-space: normal; }                                                              /* so very long lesson titles wrap inside that width */
 
 /* Menu button: only shown on phones (see the media query at the end). */
 .menu-btn {
@@ -234,13 +236,14 @@ body.home footer { background: var(--paper); position: relative; }  /* footer st
 .unit > summary::before {                      /* our own chevron */
   content: ""; width: 9px; height: 9px; flex: none;
   border-right: 2px solid var(--ink-soft); border-bottom: 2px solid var(--ink-soft);
-  transform: rotate(-45deg); transition: transform 150ms var(--ease-out);
+  transform: rotate(-45deg); transition: transform 160ms var(--ease-out);   /* 160ms = the closing slide below, so both finish together */
 }
-.unit[open] > summary::before { transform: rotate(45deg); }
+.unit[open]:not(.is-closing) > summary::before { transform: rotate(45deg); transition-duration: 220ms; }  /* .is-closing is added by nav.js when it slides by hand */
 .unit > summary a { text-decoration: none; }
 .unit .lessons { list-style: none; margin: 0; padding: 0 0 22px 23px; display: grid; gap: 8px; }
 .unit .lessons li.review { font-weight: 600; margin-top: 6px; }
 .unit .lessons .note { color: var(--ink-soft); font-size: .95rem; font-style: italic; }
+.unit .lessons a:focus-visible { outline-offset: 0; }   /* the sliding box clips its edges, so keep the focus ring close enough to fit inside */
 
 /* ----- Lesson page ----------------------------------------------------- */
 /* nav.js adds class "lesson-layout" and inserts the unit outline (.outline). */
@@ -370,16 +373,25 @@ body.home .brand::before { animation: dot-pulse 5s ease-in-out infinite; }
   a.subject-row:hover .count { color: var(--ink); }       /* the small description brightens with the row */
 }
 
-/* Unit lists and the lesson outline slide open and shut instead of jumping. */
-.unit::details-content, .outline::details-content {
+/* The lesson outline slides open and shut instead of jumping. */
+.outline::details-content {
   block-size: 0; overflow: clip;                                  /* closed: zero height, content clipped */
   transition: block-size 220ms var(--ease-out), content-visibility 220ms allow-discrete;  /* animate the height */
 }
-.unit[open]::details-content, .outline[open]::details-content { block-size: auto; }  /* open: natural height */
+.outline[open]::details-content { block-size: auto; }            /* open: natural height */
 
-/* Phone menu fades and drops in 6px. (It closes instantly, which feels quicker.) */
-.menu.open { transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out); }
-@starting-style { .menu.open { opacity: 0; transform: translateY(-6px); } }  /* the look it animates from */
+/* Unit lists slide the same way, but shut a little faster than they open (220ms open, 160ms shut).
+   A transition uses the timing of the state it is heading INTO, so the plain rule is the closing speed. */
+.unit::details-content {
+  block-size: 0; overflow: clip;
+  transition: block-size 160ms var(--ease-out), content-visibility 160ms allow-discrete;
+}
+.unit[open]::details-content { block-size: auto; transition-duration: 220ms; }
+/* Browsers that cannot slide <details> in CSS: nav.js adds .js-details to <html> and slides by hand instead. */
+.js-details .unit::details-content, .js-details .unit[open]::details-content { transition: none; }
+/* Keyboard-triggered changes are instant: nav.js adds .instant for two frames.
+   !important so it beats the more specific open/closed rules above and in the phone section. */
+.unit.instant::details-content, .unit.instant > summary::before, .menu.instant { transition: none !important; }
 
 /* ----- Tablets and phones --------------------------------------------- */
 @media (max-width: 900px) {
@@ -394,15 +406,21 @@ body.home .brand::before { animation: dot-pulse 5s ease-in-out infinite; }
   body.home::before { background: color-mix(in srgb, var(--paper) 72%, transparent); }  /* on a phone the text spans the screen, so veil it all */
   .menu-btn { display: inline-block; }
   .menu {                                        /* menu becomes a stacked panel */
-    display: none; position: absolute; top: 100%; left: 0; right: 0;
+    display: flex; position: absolute; top: 100%; left: 0; right: 0;   /* always laid out; hidden with visibility so it can fade */
     flex-direction: column; gap: 0;
     background: var(--surface); border-bottom: 1px solid var(--line);
-    padding: 8px 12px 12px; max-height: 70vh; overflow-y: auto;
+    padding: 8px 12px 12px; max-height: 70vh; overflow-y: auto; overflow-x: hidden;   /* never scrolls sideways */
+    visibility: hidden; opacity: 0; transform: translateY(-6px);                       /* closed: invisible, unreachable by keyboard, nudged up */
+    transition: opacity 120ms var(--ease-out), transform 120ms var(--ease-out), visibility 0s linear 120ms;  /* closing: quick fade, then hide */
   }
-  .menu.open { display: flex; }                  /* nav.js adds class "open" */
-  .menu ul, .menu li:hover > ul, .menu li:focus-within > ul {
-    visibility: visible; opacity: 1; transform: none; transition: none;   /* always shown, no animation */
-    position: static;                            /* no fly-outs: just indent */
+  .menu.open {                                   /* nav.js adds class "open" */
+    visibility: visible; opacity: 1; transform: none;
+    transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out), visibility 0s;   /* opening: fade and drop in */
+  }
+  .menu a, .menu .menu-label { white-space: normal; }   /* long lesson names wrap instead of running off the edge */
+  .menu ul, .menu ul ul, .menu li:hover > ul, .menu li:focus-within > ul {
+    visibility: inherit; opacity: 1; transform: none; transition: none;   /* always shown with the panel (inherit: hidden when the panel is hidden), no animation of their own */
+    position: static; right: auto;               /* no fly-outs: just indent (right: auto undoes the leftward placement above) */
     border: 0; min-width: 0; padding: 0 0 0 16px;
   }
   .menu ul ul { padding-left: 16px; }
@@ -414,13 +432,14 @@ body.home .brand::before { animation: dot-pulse 5s ease-in-out infinite; }
 
 /* Reduced motion means gentler, not nothing: colour fades stay, sliding and rotating go. */
 @media (prefers-reduced-motion: reduce) {
-  .unit::details-content, .outline::details-content { transition: none; }   /* no height slide */
-  .unit > summary::before { transition: none; }                             /* chevron flips instantly */
+  .unit::details-content, .unit[open]::details-content, .outline::details-content { transition: none; }   /* no height slide */
+  .unit > summary::before, .unit[open]:not(.is-closing) > summary::before { transition: none; }          /* chevron flips instantly */
   .menu-btn, .unit-controls button { transition: background-color 120ms ease; }  /* no press shrink */
-  .menu.open { transition: opacity 120ms ease; }                            /* fade only */
+  .menu { transform: none; transition: opacity 120ms ease, visibility 0s linear 120ms; }   /* phone menu: fade only, no drop */
+  .menu.open { transition: opacity 120ms ease; }
   .bg-demo { animation: none; }                                             /* background appears without fading in */
   .hero h1 .w, .home .lede, .home .subject-row, body.home .brand::before { animation: none; }  /* no entrance, no pulse */
-  .menu ul { transform: none; transition: opacity 120ms ease, visibility 0s linear 120ms; }     /* dropdown fades only */
+  .menu ul, .menu ul ul { transform: none; transition: opacity 120ms ease, visibility 0s linear 120ms; }   /* dropdowns fade only, no nudge */
+  .menu li:hover > ul, .menu li:focus-within > ul { transition: opacity 120ms ease, visibility 0s; }       /* opening: fade, no wait */
   .menu > li > a::after { transition: none; }                               /* underline appears without sliding */
-  @starting-style { .menu.open { transform: none; } }                       /* no 6px drop */
 }

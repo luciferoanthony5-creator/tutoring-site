@@ -61,10 +61,29 @@ function buildMenu() {
   $("menu").innerHTML = html;
 }
 
+/* --- Motion helpers --------------------------------------------------- */
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)");   // matches when the visitor asked for less motion
+
+/* Keyboard-triggered changes should be instant. A click made with Enter or Space has e.detail === 0
+   (a mouse or finger click has 1 or more). This adds the class .instant for two frames; style.css
+   switches transitions off while it is there, so the change itself happens without animation. */
+function skipMotion(el) {
+  el.classList.add("instant");                                    // classList.add puts a class on the element
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove("instant")));   // two frames later, take it off
+}
+
 /* --- Phone menu button ------------------------------------------------ */
-$("menu-btn").addEventListener("click", () => {
-  const open = $("menu").classList.toggle("open");
-  $("menu-btn").setAttribute("aria-expanded", String(open));
+function setPhoneMenu(open, instant) {
+  const menu = $("menu");                                         // the panel
+  if (instant) skipMotion(menu);                                  // no fade for keyboard users
+  menu.classList.toggle("open", open);                            // toggle(name, true/false) forces the class on or off
+  $("menu-btn").setAttribute("aria-expanded", String(open));      // tells screen readers whether it is open
+}
+$("menu-btn").addEventListener("click", (e) => {
+  setPhoneMenu(!$("menu").classList.contains("open"), e.detail === 0);   // flip it; e.detail === 0 means the keyboard clicked
+});
+matchMedia("(max-width: 720px)").addEventListener("change", (e) => {     // runs when the window crosses the phone breakpoint
+  if (!e.matches) setPhoneMenu(false, true);                      // wider than a phone: reset the panel so it isn't left "open"
 });
 
 /* --- Subject page: list of units ------------------------------------- */
@@ -89,12 +108,58 @@ function buildUnitList() {
   }
   $("unit-list").innerHTML = html;
 
-  $("expand-all")?.addEventListener("click", () => {   // ?. = only if the button exists
-    for (const d of document.querySelectorAll(".unit")) d.open = true;
+  const units = document.querySelectorAll(".unit");
+  for (const d of units) {
+    d.querySelector("summary").addEventListener("click", (e) => {
+      if (e.target.closest("a")) return;              // the unit's overview link should just navigate
+      e.preventDefault();                             // stop the browser's own toggle; setUnit does it so we control the motion
+      setUnit(d, !isOpen(d), e.detail === 0);         // flip it; e.detail === 0 means the keyboard clicked
+    });
+  }
+  $("expand-all")?.addEventListener("click", (e) => {   // ?. = only if the button exists
+    for (const d of units) setUnit(d, true, e.detail === 0);
   });
-  $("collapse-all")?.addEventListener("click", () => {
-    for (const d of document.querySelectorAll(".unit")) d.open = false;
+  $("collapse-all")?.addEventListener("click", (e) => {
+    for (const d of units) setUnit(d, false, e.detail === 0);
   });
+}
+
+/* A unit that is sliding shut still has its "open" attribute (so the lessons stay visible), but
+   nav.js marks it .is-closing, so this says whether it counts as open. */
+const isOpen = (d) => d.open && !d.classList.contains("is-closing");
+
+/* Can this browser slide a <details> in CSS alone? If not (older Safari or Firefox), nav.js slides by hand. */
+const CSS_SLIDE = CSS.supports("selector(::details-content)") && CSS.supports("interpolate-size", "allow-keywords");
+if (!CSS_SLIDE) document.documentElement.classList.add("js-details");   // style.css then leaves the sliding to slideUnit below
+
+function setUnit(d, open, instant) {
+  if (isOpen(d) === open) return;                     // already (heading) that way: nothing to do
+  if (instant) skipMotion(d);                         // keyboard: no CSS transition
+  if (CSS_SLIDE) d.open = open;                       // CSS slides it: just flip the attribute
+  else slideUnit(d, open, instant || REDUCED.matches);   // otherwise slide by hand
+}
+
+/* Slide by hand with the Web Animations API (element.animate): no library needed. */
+function slideUnit(d, open, instant) {
+  const from = d.getBoundingClientRect().height;      // height on screen right now, even mid-slide, so a reversal starts from here
+  d._slide?.cancel();                                 // stop an older slide (its onfinish below will not run); _slide is a property we add to the element
+  d.style.height = ""; d.style.overflow = "";         // clear leftovers so the natural height can be measured
+  d.classList.toggle("is-closing", !open);            // closing keeps "open" until the slide ends
+  if (open) d.open = true;                            // opening: show the lessons first, then grow
+  const borders = parseFloat(getComputedStyle(d).borderTopWidth) + parseFloat(getComputedStyle(d).borderBottomWidth);
+  const to = open ? d.getBoundingClientRect().height  // natural open height
+                  : d.querySelector("summary").getBoundingClientRect().height + borders;   // closed = just the heading
+  const finish = () => {                              // the end state, reached by the slide or immediately
+    d._slide = null;
+    d.style.height = ""; d.style.overflow = "";       // give height control back to the page (also fixes it if the window was resized)
+    if (!open) { d.open = false; d.classList.remove("is-closing"); }   // now really close it
+  };
+  if (instant || Math.abs(from - to) < 1) return finish();
+  d.style.overflow = "hidden";                        // hide lessons that stick out while the box is short
+  const slide = d.animate({ height: [`${from}px`, `${to}px`] },
+    { duration: open ? 220 : 160, easing: "cubic-bezier(0.23, 1, 0.32, 1)", fill: "forwards" });   // same timing and curve as the CSS version
+  d._slide = slide;
+  slide.onfinish = () => { if (d._slide === slide) { finish(); slide.cancel(); } };   // ignore a slide that was replaced; cancel() drops the forwards fill
 }
 
 /* --- Lesson page: Previous / Next ------------------------------------ */
@@ -138,13 +203,11 @@ function buildOutline() {
 document.addEventListener("keydown", (e) => {          // runs on every key press
   if (e.key !== "Escape") return;                      // ignore every key except Esc
   const menu = $("menu");
-  if (menu.contains(document.activeElement)) {         // focus is inside the menu
-    document.activeElement.blur();                     // drop focus: the :focus-within fly-out closes
-    if (menu.classList.contains("open")) {             // phone menu panel
-      menu.classList.remove("open");
-      $("menu-btn").setAttribute("aria-expanded", "false");
-      $("menu-btn").focus();                           // put the keyboard back on the Menu button
-    }
+  const inMenu = menu.contains(document.activeElement);   // is the keyboard focus inside the menu?
+  if (inMenu) document.activeElement.blur();           // drop focus: the :focus-within fly-out closes
+  if (menu.classList.contains("open")) {               // phone menu panel is open (focus on its button, inside it, or elsewhere)
+    setPhoneMenu(false, true);                         // close it at once: Esc is a keyboard action
+    if (inMenu) $("menu-btn").focus();                 // focus was inside the now-hidden panel: put the keyboard back on the Menu button
   }
 });
 
