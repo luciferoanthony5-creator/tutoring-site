@@ -106,4 +106,4 @@ site updates within a minute or two. GitHub keeps a history of every change.
 - Lesson video IDs `VIDEO_ID_11` etc. Only the two unit overview videos are real.
 - Worksheets and answer keys are LaTeX-generated placeholders with a few real
   problems each. Sources and the generator script are in `latex-sources/` (run `python3 make_pdfs.py` there to rebuild).
-- `about.html` email address; `privacy.html` text (expand before AdSense).
+- `privacy.html` text (expand before AdSense).
