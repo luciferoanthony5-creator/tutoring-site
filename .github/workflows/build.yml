@@ -1,0 +1,62 @@
+# Runs on GitHub after every push to main (your pushes and saves made in the Pages CMS editor):
+#   1. rebuilds the lesson pages from content/   (scripts/build.py)
+#   2. saves the rebuilt pages back into the repo
+#   3. publishes the site to GitHub Pages
+# Step 3 needs one setting: repo Settings > Pages > Build and deployment > Source = "GitHub Actions".
+name: Build and publish
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:          # adds a "Run workflow" button on the Actions tab
+
+permissions:
+  contents: write             # may commit the rebuilt pages
+  pages: write                # may publish to GitHub Pages
+  id-token: write             # required by the publish step
+
+concurrency:
+  group: pages                # one run at a time; a newer push waits for the older one
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rebuild lesson pages
+        run: python3 scripts/build.py
+
+      - name: Save rebuilt pages to the repo
+        run: |
+          git config user.name "site-build"
+          git config user.email "site-build@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Build: regenerate lesson pages"
+            git pull --rebase
+            git push
+          fi
+
+      - name: Collect the public files
+        run: |
+          rsync -a ./ _site/ \
+            --exclude '.git*' --exclude '.agents' --exclude '.claude' --exclude '.playwright-mcp' --exclude '.syndor' \
+            --exclude '.pages.yml' --exclude '_site' --exclude 'claude' --exclude 'docs' --exclude 'scripts' \
+            --exclude 'templates' --exclude 'content' --exclude 'latex-sources' --exclude 'manim-sources' \
+            --exclude '*.md' --exclude 'skills-lock.json'
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

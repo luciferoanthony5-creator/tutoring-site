@@ -1,0 +1,15 @@
+{
+  "title": "2.3 Gauss's Law: Cylindrical and Planar Symmetry",
+  "subject": "electricity-magnetism",
+  "unit": 2,
+  "order": 3,
+  "kind": "lesson",
+  "summary": "Infinite line of charge, infinite sheet, and a charged conductor in equilibrium.",
+  "video": "VIDEO_ID_23",
+  "worksheet": "/electricity-magnetism/unit-2/2-3-worksheet.pdf",
+  "answer_key": "/electricity-magnetism/unit-2/2-3-solutions.pdf",
+  "extras": [],
+  "note": "",
+  "author": "",
+  "published": true
+}

@@ -1,7 +1,8 @@
 # AntsPhysicsLessons (placeholder name)
 
 Free physics video lessons and worksheets. A plain static site: HTML, CSS, one
-small JavaScript file, and PDFs. No build step, no framework.
+small JavaScript file, and PDFs. No framework; one small Python script
+(`scripts/build.py`) builds the lesson pages from `content/`.
 
 ## Folder layout
 
@@ -9,7 +10,12 @@ small JavaScript file, and PDFs. No build step, no framework.
 index.html                         home page
 about.html  privacy.html  404.html
 assets/style.css                   all styling (colours at the top)
-assets/lessons.js                  THE list of subjects / units / lessons
+content/                           lesson data: site.json, subjects.json, lessons/*.json
+templates/lesson.html              the page every lesson is built from
+scripts/build.py                   builds lesson pages, assets/lessons.js, sitemap.xml
+files/                             PDFs uploaded through the editor
+.pages.yml                         the editor's forms (Pages CMS)
+assets/lessons.js                  GENERATED list of subjects / units / lessons
 assets/nav.js                      builds the menu, unit list, prev/next from that list
 assets/demos.js                    the physics demos (field, projectile)
 assets/video/                      home-page background loop (made by manim-sources/)
@@ -24,16 +30,33 @@ sitemap.xml  robots.txt            for search engines (update the domain inside)
 
 ## Adding a lesson
 
-1. In the unit folder, copy an existing lesson file, e.g. `1-1-coulombs-law.html`
-   to `1-4-new-topic.html`. Edit the `<title>`, `<meta name="description">`,
-   the `<h1>`, the blurb, the YouTube ID after `/embed/`, the PDF links, and
-   the `data-lesson="1-4-new-topic"` attribute on `<body>`.
-2. Put the PDFs in the same folder.
-3. Add one line to the unit's `lessons` list in `assets/lessons.js`.
-   The menu, the subject page, and the Previous/Next links update themselves.
+Lessons are data, not hand-made pages. Each lesson is one small file in
+`content/lessons/`; `scripts/build.py` turns them into the lesson pages,
+`assets/lessons.js` and `sitemap.xml` (do not edit those by hand).
 
-Adding a unit: make a folder `unit-3`, give it an `index.html` (copy a unit
-overview page), and add a unit block to `assets/lessons.js`.
+**In the browser (you and invited tutors):** open https://app.pagescms.org,
+choose this site, then Lessons > Add an entry. Fill in the title, subject, unit,
+paste the YouTube link, drag in the worksheet and answer key PDFs, and Save.
+The site rebuilds itself in a minute or two.
+
+**By hand:** copy a file in `content/lessons/`, edit it, put the PDFs in
+`files/`, then run `python3 scripts/build.py`.
+
+Adding a unit: add it under "Subjects and units" in the editor (or in
+`content/subjects.json`). Adding a subject also needs a subject page
+(`<subject>/index.html`) and a line in the `subject` list in `.pages.yml`.
+
+## One-time setup for the editor (owner only)
+
+1. Push this repo, then on GitHub: Settings > Pages > Build and deployment >
+   Source: **GitHub Actions**. (Until you do, the "Build and publish" run on the
+   Actions tab shows a red X at the publish step and the site only updates when
+   you push yourself.)
+2. Go to https://app.pagescms.org, sign in with GitHub, and install the Pages CMS
+   GitHub App on the `tutoring-site` repo only.
+3. Open the repo there; the forms come from `.pages.yml`.
+4. To invite a tutor: Collaborators > enter their email. They get a sign-in link
+   and need no GitHub account. They can add and edit lessons and PDFs, nothing else.
 
 ## Testing on your computer
 
@@ -70,15 +93,15 @@ site updates within a minute or two. GitHub keeps a history of every change.
 1. Buy the domain. In its DNS settings add four A records for `@` pointing
    to GitHub Pages' IPs (185.199.108.153, .109.153, .110.153, .111.153) and a
    CNAME record for `www` pointing to `YOUR-USERNAME.github.io`.
-2. In **Settings → Pages → Custom domain** enter the domain and save; GitHub
-   creates a `CNAME` file in the repo. Tick **Enforce HTTPS** once it is offered.
-3. Replace `https://luciferoanthony5-creator.github.io/tutoring-site` in
-   `sitemap.xml` and `robots.txt` with the real domain, and in `404.html`
-   change `/tutoring-site/` to `/` (the 404 page needs absolute paths).
+2. In **Settings → Pages → Custom domain** enter the domain and save.
+   Tick **Enforce HTTPS** once it is offered.
+3. Put the real address in `content/site.json` (`url`, and the new `name` and
+   `tld`) and in `robots.txt`; in `404.html` change `/tutoring-site/` to `/`
+   (the 404 page needs absolute paths). Run `python3 scripts/build.py`.
 
 ## Placeholders still in the site
 
-- Site name `AntsPhysicsLessons` (set once in `assets/lessons.js`; also in
+- Site name `AntsPhysicsLessons` (set once in `content/site.json`; also in
   `<title>` tags and `README.md`).
 - Lesson video IDs `VIDEO_ID_11` etc. Only the two unit overview videos are real.
 - Worksheets and answer keys are LaTeX-generated placeholders with a few real

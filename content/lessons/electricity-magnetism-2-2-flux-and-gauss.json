@@ -1,0 +1,15 @@
+{
+  "title": "2.2 Electric Flux and Gauss's Law: Spherical Symmetry",
+  "subject": "electricity-magnetism",
+  "unit": 2,
+  "order": 2,
+  "kind": "lesson",
+  "summary": "Flux through closed surfaces; field inside and outside a uniformly charged sphere.",
+  "video": "VIDEO_ID_22",
+  "worksheet": "/electricity-magnetism/unit-2/2-2-worksheet.pdf",
+  "answer_key": "/electricity-magnetism/unit-2/2-2-solutions.pdf",
+  "extras": [],
+  "note": "",
+  "author": "",
+  "published": true
+}

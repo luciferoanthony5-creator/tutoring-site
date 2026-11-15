@@ -1,0 +1,23 @@
+[
+  {
+    "slug": "electricity-magnetism",
+    "title": "Electricity & Magnetism",
+    "short": "E&M",
+    "units": [
+      {
+        "number": 1,
+        "title": "Electric Charge, Force, and Field"
+      },
+      {
+        "number": 2,
+        "title": "Gauss's Law"
+      }
+    ]
+  },
+  {
+    "slug": "mechanics",
+    "title": "Mechanics",
+    "short": "Mechanics",
+    "units": []
+  }
+]

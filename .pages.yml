@@ -1,0 +1,136 @@
+# .pages.yml  -  tells the Pages CMS editor (https://app.pagescms.org) what forms to show.
+# People you invite by email see these forms; they never see the code.
+# Saving a form writes a file under content/ (or a PDF under files/), and GitHub then
+# runs scripts/build.py to rebuild the lesson pages (see .github/workflows/build.yml).
+
+# Where uploaded PDFs go.
+media:
+  - name: files                      # the name the fields below refer to
+    label: Worksheets and answer keys (PDF)
+    input: files                     # folder in the repo
+    output: /files                   # address written into the lesson file
+    extensions: [pdf]                # only PDFs may be uploaded
+    rename: safe                     # "My Sheet (1).pdf" becomes "my-sheet-1.pdf"
+
+content:
+  # One entry per lesson. Each is saved as content/lessons/<subject>-<title>.json
+  - name: lessons
+    label: Lessons
+    type: collection
+    path: content/lessons
+    format: json
+    filename: "{fields.subject}-{primary}.json"
+    view:
+      fields: [title, subject, unit, published]   # columns in the list of lessons
+      primary: title
+      sort: [subject, unit, order, title]
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+        description: 'Start numbered lessons with the number, e.g. "1.4 Electric Potential".'
+      - name: subject
+        label: Subject
+        type: select
+        required: true
+        options:
+          values:                    # keep in step with "Subjects and units" below (name = the subject's folder)
+            - { name: electricity-magnetism, label: Electricity & Magnetism }
+            - { name: mechanics, label: Mechanics }
+      - name: unit
+        label: Unit number
+        type: number
+        required: true
+        description: The unit must already exist under "Subjects and units".
+        options: { min: 1 }
+      - name: order
+        label: Position in the unit
+        type: number
+        description: 'For lesson 1.4 enter 4. Leave 0 for an overview or a review.'
+      - name: kind
+        label: Kind of page
+        type: select
+        required: true
+        default: lesson
+        options:
+          values:
+            - { name: lesson, label: Lesson }
+            - { name: overview, label: Unit overview (one per unit) }
+            - { name: review, label: Unit review }
+      - name: summary
+        label: One-sentence summary
+        type: text
+        description: Shown under the title and in search results.
+      - name: video
+        label: YouTube link
+        type: string
+        description: Paste the link to the video (unlisted is fine). Leave empty for a page with no video.
+      - name: worksheet
+        label: Worksheet (PDF)
+        type: file
+        options: { media: files, extensions: [pdf] }
+      - name: answer_key
+        label: Answer key (PDF)
+        type: file
+        options: { media: files, extensions: [pdf] }
+      - name: extras
+        label: Extra files
+        type: object
+        list: true
+        fields:
+          - { name: label, label: Name shown on the page, type: string }
+          - { name: file, label: File (PDF), type: file, options: { media: files, extensions: [pdf] } }
+      - name: worksheet_label
+        label: Worksheet name (optional)
+        type: string
+        description: 'Leave empty to get "Worksheet 1.4".'
+      - name: answer_key_label
+        label: Answer key name (optional)
+        type: string
+      - name: note
+        label: Note under the lesson in the unit list (optional)
+        type: string
+      - name: author
+        label: Made by (optional)
+        type: string
+        description: 'Shown as "Lesson by ..." under the summary.'
+      - name: published
+        label: Published
+        type: boolean
+        default: true
+        description: Untick to keep a draft off the site.
+
+  # Subjects and their units. A new subject also needs a subject page made in the code.
+  - name: subjects
+    label: Subjects and units
+    type: file
+    path: content/subjects.json
+    format: json
+    list: true
+    fields:
+      - { name: title, label: Subject name, type: string, required: true }
+      - { name: short, label: Short name for the menu, type: string }
+      - { name: slug, label: Folder name (do not change once live), type: string, required: true, pattern: "^[a-z0-9-]+$" }
+      - name: units
+        label: Units
+        type: object
+        list: true
+        fields:
+          - { name: number, label: Unit number, type: number, required: true }
+          - { name: title, label: Unit title, type: string, required: true }
+
+  # Site name and address, used on every page.
+  - name: site
+    label: Site name
+    type: file
+    path: content/site.json
+    format: json
+    fields:
+      - { name: name, label: Site name, type: string, required: true }
+      - { name: tld, label: 'Ending shown after the name (e.g. ".com", or empty)', type: string }
+      - { name: url, label: 'Web address (no slash at the end)', type: string, required: true }
+
+settings:
+  commit:
+    identity: user                   # record which invited person made each change

@@ -1,0 +1,15 @@
+{
+  "title": "1.1 Coulomb's Law and Superposition",
+  "subject": "electricity-magnetism",
+  "unit": 1,
+  "order": 1,
+  "kind": "lesson",
+  "summary": "Net force on a point charge from several fixed charges; components and symmetry.",
+  "video": "VIDEO_ID_11",
+  "worksheet": "/electricity-magnetism/unit-1/1-1-worksheet.pdf",
+  "answer_key": "/electricity-magnetism/unit-1/1-1-solutions.pdf",
+  "extras": [],
+  "note": "",
+  "author": "",
+  "published": true
+}

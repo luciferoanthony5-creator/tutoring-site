@@ -299,6 +299,8 @@ body.home footer { background: var(--paper); position: relative; }  /* footer st
 }
 .downloads a[href*="worksheet"] .pdf { color: var(--pos-ink); }  /* worksheet = red */
 .downloads a[href*="solutions"] .pdf { color: var(--neg); }      /* answer key = blue */
+.downloads .pdf.ws  { color: var(--pos-ink); }                   /* same colours by class: pages made by scripts/build.py mark the tag itself */
+.downloads .pdf.key { color: var(--neg); }
 .downloads .file { margin-left: auto; color: var(--ink-soft); font-size: .88rem; }
 
 /* Reserved ad slot (Phase 4). Hidden until AdSense is set up. */
@@ -338,7 +340,6 @@ footer a { color: var(--ink-soft); }
   .unit-controls button:hover { background: var(--tint); }
   .unit > summary a:hover { text-decoration: underline; }
   .outline li a:hover, .downloads a:hover { background: var(--tint); color: var(--ink); }
-  .prevnext a:hover { text-decoration: underline; }
 }
 
 /* Top-level menu items: a thin underline slides in from the left on hover and keyboard focus. */
@@ -395,6 +396,50 @@ body.home .brand::before { animation: dot-pulse 5s ease-in-out infinite; }
 /* Keyboard-triggered changes are instant: nav.js adds .instant for two frames.
    !important so it beats the more specific open/closed rules above and in the phone section. */
 .unit.instant::details-content, .unit.instant > summary::before, .menu.instant, .menu.instant ul { transition: none !important; }   /* .menu.instant ul: the fly-outs inside the menu (transition is not inherited) */
+
+/* ----- Smooth clicks: page-to-page fade, tap feedback, wayfinding ------ */
+/* Moving between pages: the browser cross-fades the old page into the new one instead of flashing white.
+   Only for visitors who have not asked for reduced motion. Browsers that don't know this rule skip it. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }                 /* auto = apply to ordinary link clicks within this site */
+}
+.topbar { view-transition-name: topbar; }                /* a name of its own: the header stays put while the page under it fades */
+::view-transition-old(root) { animation-duration: 120ms; }   /* old page leaves quickly ... */
+::view-transition-new(root) { animation-duration: 180ms; }   /* ... new page arrives a touch slower (exit faster than enter) */
+::view-transition-group(topbar), ::view-transition-old(topbar), ::view-transition-new(topbar) { animation-duration: 180ms; }  /* header keeps the same pace */
+
+html { scroll-padding-top: 76px; -webkit-tap-highlight-color: transparent; }  /* jumps (Skip link) stop below the sticky header; no grey flash on phone taps, the rule below replaces it */
+body { -webkit-font-smoothing: antialiased; }            /* thinner, crisper text on Macs and iPhones */
+
+/* Press feedback: a row tints the instant it is pressed (mouse or finger), so every tap is answered at once. */
+.menu a:active, .subject-row:active, .outline li a:active, .downloads a:active, .prevnext a:active {
+  background: var(--tint); transition-duration: 0s;      /* 0s = no fade on the way in; it fades back out when released */
+}
+
+/* Breadcrumb above a lesson title (built by nav.js): Subject / Unit. */
+.crumbs {
+  display: flex; flex-wrap: wrap; gap: 4px 10px;         /* items in a row that may wrap on a phone */
+  font-family: var(--font-ui); font-size: .92rem; color: var(--ink-soft);
+  margin-bottom: 14px;
+}
+.crumbs a { color: var(--ink-soft); text-decoration: none; transition: color 120ms ease; }
+@media (hover: hover) and (pointer: fine) {
+  .crumbs a:hover { color: var(--ink); text-decoration: underline; }
+}
+
+.byline { font-family: var(--font-ui); font-size: .92rem; color: var(--ink-soft); margin-top: 10px; }   /* "Lesson by ..." under the blurb, shown when a lesson names its author */
+
+/* Previous / Next: a small label over the lesson title, and the whole block is the click target. */
+.prevnext a {
+  display: grid; gap: 2px;                               /* label stacked over title */
+  padding: 10px 12px; margin-inline: -12px;              /* padding makes a bigger target; the negative margin keeps the text lined up with the page edge */
+  transition: background-color 120ms ease;
+}
+.prevnext .dir { font-size: .85rem; color: var(--ink-soft); }   /* "Previous" / "Next" */
+@media (hover: hover) and (pointer: fine) {
+  .prevnext a:hover { background: var(--tint); color: var(--ink); text-decoration: none; }   /* tint the block ... */
+  .prevnext a:hover .t { text-decoration: underline; }                                       /* ... and underline only the title */
+}
 
 /* ----- Tablets and phones --------------------------------------------- */
 @media (max-width: 900px) {

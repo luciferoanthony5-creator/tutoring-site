@@ -1,0 +1,15 @@
+{
+  "title": "1.3 Charges in Uniform Fields",
+  "subject": "electricity-magnetism",
+  "unit": 1,
+  "order": 3,
+  "kind": "lesson",
+  "summary": "Kinematics of a charge in a uniform field; electric dipoles and torque.",
+  "video": "VIDEO_ID_13",
+  "worksheet": "/electricity-magnetism/unit-1/1-3-worksheet.pdf",
+  "answer_key": "/electricity-magnetism/unit-1/1-3-solutions.pdf",
+  "extras": [],
+  "note": "Uses projectile-motion ideas from Mechanics.",
+  "author": "",
+  "published": true
+}

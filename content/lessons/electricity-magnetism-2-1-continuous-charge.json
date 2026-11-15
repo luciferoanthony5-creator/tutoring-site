@@ -1,0 +1,15 @@
+{
+  "title": "2.1 Fields of Continuous Charge Distributions",
+  "subject": "electricity-magnetism",
+  "unit": 2,
+  "order": 1,
+  "kind": "lesson",
+  "summary": "Setting up dE = k dq / r² for a rod and a ring, then integrating.",
+  "video": "VIDEO_ID_21",
+  "worksheet": "/electricity-magnetism/unit-2/2-1-worksheet.pdf",
+  "answer_key": "/electricity-magnetism/unit-2/2-1-solutions.pdf",
+  "extras": [],
+  "note": "Requires integration by substitution.",
+  "author": "",
+  "published": true
+}

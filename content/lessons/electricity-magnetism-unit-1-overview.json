@@ -1,0 +1,20 @@
+{
+  "title": "Unit 1 Overview: Electric Charge, Force, and Field",
+  "subject": "electricity-magnetism",
+  "unit": 1,
+  "order": 0,
+  "kind": "overview",
+  "summary": "Charge, Coulomb's law, and the electric field as a vector field. Watch this first.",
+  "video": "tGxjP2O5Klo",
+  "worksheet": "",
+  "answer_key": "",
+  "extras": [
+    {
+      "label": "Unit 1 notes",
+      "file": "/electricity-magnetism/unit-1/unit-1-notes.pdf"
+    }
+  ],
+  "note": "",
+  "author": "",
+  "published": true
+}

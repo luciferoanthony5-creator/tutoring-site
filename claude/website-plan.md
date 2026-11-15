@@ -2,7 +2,7 @@ Begin each response with my name: Anthony
 
 # Website Plan: Tutoring Lesson Platform
 
-Status: Phase 2 done. The site is live on GitHub Pages at https://luciferoanthony5-creator.github.io/tutoring-site/ . Now in Phase 3 (content). See section 12 for how edits get made and published.
+Status: Phase 2 done; the 2026-11-14 upgrade (section 13) added the contributor editor and the smooth-click pass. The site is live on GitHub Pages at https://luciferoanthony5-creator.github.io/tutoring-site/ . Now in Phase 3 (content). See section 12 for how edits get made and published.
 
 How to use this file: upload it at the start of a new Claude session (or rely on the copy saved in the "Website" Claude project) so the session starts from the same decisions and assumptions. Edit anything. Section 5 lists decisions; section 9 lists what Claude is assuming; section 10 is open questions; section 11 is for Anthony's notes; section 12 is the editing and publishing workflow.
 
@@ -10,7 +10,7 @@ How to use this file: upload it at the start of a new Claude session (or rely on
 
 ## 1. Concept
 
-Open-access tutoring site. No logins, no accounts, no backend, no database. Static content only: subject pages, collapsible unit lists, embedded videos, downloadable PDF worksheets and answer keys. Long-term monetization through ad revenue (Google AdSense).
+Open-access tutoring site. Visitors never log in; there is no backend or database of our own. People who post lessons (Anthony and invited tutors) sign in to a hosted editor, Pages CMS, which saves into the GitHub repo (section 13). Static content only: subject pages, collapsible unit lists, embedded videos, downloadable PDF worksheets and answer keys. Long-term monetization through ad revenue (Google AdSense).
 
 Structural reference: calculus.flippedmath.com. Only the structure is borrowed. Layout, wording, styling, videos, and worksheets are all original.
 
@@ -55,10 +55,12 @@ Subject-specific note (Electricity & Magnetism only; other subjects may differ):
 
 | Decision | Choice |
 | --- | --- |
-| Build approach | Fully custom-coded static site, built with Claude (chat / Claude Code) |
+| Build approach | Fully custom-coded static site, built with Claude (chat / Claude Code). Lesson pages are generated from `content/` by `scripts/build.py` |
+| Who needs an account | Only people who post. Lessons, videos and PDFs stay open to everyone (decided 2026-11-14) |
+| How lessons are posted | Pages CMS editor (app.pagescms.org), collaborators invited by email, no GitHub account needed (decided 2026-11-14) |
 | Hosting | GitHub Pages (free). Repo `luciferoanthony5-creator/tutoring-site`, branch `main`, folder `/ (root)` |
 | Domain | Owned custom domain pointed at GitHub Pages, roughly $10–15/year |
-| Video | Uploaded to YouTube (unlisted is fine), embedded by iframe, never linked out |
+| Video | Uploaded to YouTube by whoever made the lesson (unlisted is fine), link pasted into the editor, embedded by iframe, never linked out (re-confirmed 2026-11-14) |
 | Units on subject page | Collapsible, using native `<details>` elements, with expand-all / collapse-all buttons; units start expanded |
 | Answer keys | Posted openly on lesson pages |
 | First subject | Electricity & Magnetism |
@@ -209,3 +211,38 @@ Adding a unit: new folder `unit-3` with an `index.html` overview (copy one) and 
 **When the custom domain arrives**: follow the README's "Custom domain" section, then change three things: the base URL in `sitemap.xml` and `robots.txt`, and `/tutoring-site/` to `/` in `404.html`.
 
 **Still placeholder**: site name `AntsPhysicsLessons` (set in `assets/lessons.js` and page `<title>`s), lesson video IDs `VIDEO_ID_11` etc. (only the two unit overview videos are real), the worksheets, the About page email, the Privacy page text.
+
+## 13. Upgrade, 2026-11-14 (Anthony's notes, organised)
+
+**What Anthony asked for**
+
+| Want | Status |
+| --- | --- |
+| Smooth, sleek finish; every click smooth; easy navigation | First pass done: pages cross-fade instead of reloading with a flash, links preload on hover so clicks land at once, every row answers a tap, breadcrumb (Subject / Unit) and labelled Previous / Next on lessons. The look itself (Field Lines) was kept; it already reads as designed, not templated. |
+| Accounts, so Anthony and invited people can post videos and PDFs without the code | Built: lesson data in `content/`, forms in `.pages.yml`, build in `scripts/build.py`, publish in `.github/workflows/build.yml`. Needs Anthony's one-time setup (README, "One-time setup for the editor"). |
+| "If something easier than accounts exists, consider it" | Chosen: Pages CMS. No login system of our own to build or secure; invited tutors get an email link. |
+| About page: not a physics teacher | Done: mechanical engineering undergraduate, tutor and learning assistant. |
+| Official name, not personal, physics-themed is fine | Open. Shortlist below. |
+| Domain | Not needed for accounts or the editor. Needed later for AdSense and a proper address. Buy it when the name is settled; pointing the site at it is a ten-minute job (README, "Custom domain"). |
+
+**Name shortlist** (Haiku produced 120; these survived). "Free?" means no DNS record was found on 2026-11-14 for .com and .org, which suggests but does not prove the domain is unregistered; check at a registrar before deciding.
+
+| Name | Why | Free? |
+| --- | --- | --- |
+| Plain Reasoning | Calm, subject-neutral, says how the lessons teach | .com and .org |
+| Worked Problems | Says exactly what the lesson videos are | .com and .org |
+| Free Body Lessons / Free Body Notes | Free-body diagram: physics and engineering, and "free" is true | .com and .org |
+| Flux Commons | "Commons" fits several tutors posting | .com and .org |
+| Clarity Hall | A shared place where many people teach | .com and .org |
+| Rest Frame | Short physics term, calm | .org only (plus restframelessons.com) |
+| Test Charge | Matches the red/blue charge logo | .org only (plus testchargelessons.com) |
+| The Field Lines | Matches the site's look | .com and .org |
+| Lucid Lessons | Friendly, any subject | .com and .org |
+
+**Still to do**
+
+1. Anthony: the one-time editor setup in the README (switch Pages to GitHub Actions, install Pages CMS, invite people).
+2. Anthony: pick a name, buy the domain, then change `content/site.json`.
+3. First real use of the editor: check that editing an existing lesson keeps its PDF links (the old PDFs sit beside the lessons, outside `files/`), and that the file name pattern in `.pages.yml` gives sensible page addresses.
+4. Design, next passes: real video thumbnails with a play button instead of the black YouTube box; a subject page for each new subject; Safari and Firefox checks (only Chromium was tested; they fall back to ordinary page loads).
+5. Contributor credit: lessons have an optional "Made by" field shown as "Lesson by ..."; decide whether the About page should list contributors.

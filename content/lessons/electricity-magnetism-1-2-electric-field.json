@@ -1,0 +1,15 @@
+{
+  "title": "1.2 Electric Field of Point Charges",
+  "subject": "electricity-magnetism",
+  "unit": 1,
+  "order": 2,
+  "kind": "lesson",
+  "summary": "Field vectors from several point charges; finding where the net field is zero.",
+  "video": "VIDEO_ID_12",
+  "worksheet": "/electricity-magnetism/unit-1/1-2-worksheet.pdf",
+  "answer_key": "/electricity-magnetism/unit-1/1-2-solutions.pdf",
+  "extras": [],
+  "note": "",
+  "author": "",
+  "published": true
+}

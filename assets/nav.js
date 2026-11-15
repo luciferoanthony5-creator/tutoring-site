@@ -172,10 +172,9 @@ function buildPrevNext() {
     l.slug === body.dataset.lesson);
   if (i < 0) return;                              // page not in lessons.js
   const prev = ALL[i - 1], next = ALL[i + 1];      // neighbours in the flattened list
-  const link = (l, cls, text) =>                   // builds one <a> (empty string if there is no lesson)
-    l ? `<a class="${cls}" href="${lessonPath(l.subject, l.unit, l)}">${text}</a>` : "";
-  const html = link(prev, "prev", `&larr; ${esc(prev?.title ?? "")}`) +   // ?. and ?? avoid errors when prev is missing
-               link(next, "next", `${esc(next?.title ?? "")} &rarr;`);
+  const link = (l, cls, label) =>                  // builds one <a> (empty string if there is no lesson): a small label over the title
+    l ? `<a class="${cls}" href="${lessonPath(l.subject, l.unit, l)}"><span class="dir">${label}</span><span class="t">${esc(l.title)}</span></a>` : "";
+  const html = link(prev, "prev", "&larr; Previous") + link(next, "next", "Next &rarr;");
   for (const bar of bars) bar.innerHTML = html;
 }
 
@@ -197,6 +196,52 @@ function buildOutline() {
   wrap.classList.add("lesson-layout");                    // switches on the two-column layout in style.css
   wrap.prepend(aside);                                    // put the outline first inside the wrapper
   aside.style.gridRow = `1 / span ${wrap.children.length - 1}`;  // let it run alongside the other rows
+}
+
+/* --- Lesson page: breadcrumb above the title (Subject / Unit) --------- */
+function buildCrumbs() {
+  const subject = SUBJECTS.find((s) => s.slug === body.dataset.subject);
+  const unit = subject?.units.find((u) => u.folder === body.dataset.unit);
+  const h1 = document.querySelector("main h1");
+  if (!unit || !h1 || !body.dataset.lesson) return;       // only lesson pages
+  const overview = unit.lessons.find((l) => l.overview);  // the unit's overview page, if it has one
+  const unitText = `Unit ${unit.number}`;
+  const unitPart = overview && overview.slug !== body.dataset.lesson   // link to the overview unless we are on it
+    ? `<a href="${lessonPath(subject, unit, overview)}">${unitText}</a>`
+    : `<span>${unitText}</span>`;
+  const nav = document.createElement("nav");              // <nav> = a block of navigation links
+  nav.className = "crumbs";
+  nav.setAttribute("aria-label", "Breadcrumb");           // name read out by screen readers
+  nav.innerHTML = `<a href="${ROOT}${subject.slug}/index.html">${esc(subject.title)}</a><span aria-hidden="true">/</span>${unitPart}`;
+  h1.before(nav);                                         // put it just above the title
+}
+
+/* --- Instant clicks: load a page in the background before it is clicked --- */
+function preloadLinks() {
+  const isPage = (a) => a.origin === location.origin && !a.pathname.endsWith(".pdf") && a.pathname !== location.pathname;  // this site, not a PDF, not this page
+  if (HTMLScriptElement.supports?.("speculationrules")) {  // Chrome and Edge: the browser does it for us from one rule
+    const rules = document.createElement("script");
+    rules.type = "speculationrules";
+    rules.textContent = JSON.stringify({                   // JSON.stringify turns the object into text
+      prerender: [{                                        // prerender = build the whole page off-screen
+        where: { and: [{ href_matches: "/*" }, { not: { href_matches: "/*.pdf" } }] },   // links on this site, except PDFs
+        eagerness: "moderate",                             // start when the mouse rests on a link, or a finger touches it
+      }],
+    });
+    document.head.append(rules);
+    return;
+  }
+  const done = new Set();                                  // other browsers: fetch the page on hover/touch, each address once
+  const warm = (e) => {
+    const a = e.target.closest?.("a[href]");               // the link under the pointer, if any
+    if (!a || !isPage(a) || done.has(a.href)) return;
+    done.add(a.href);
+    const link = document.createElement("link");
+    link.rel = "prefetch"; link.href = a.href;             // <link rel="prefetch"> = download now, keep for later
+    document.head.append(link);
+  };
+  document.addEventListener("pointerover", warm, { passive: true });
+  document.addEventListener("touchstart", warm, { passive: true });
 }
 
 /* --- Esc closes the open menu ----------------------------------------- */
@@ -230,4 +275,7 @@ buildMenu();
 revealHeadline();
 buildUnitList();
 buildPrevNext();
+buildCrumbs();
 buildOutline();
+preloadLinks();
+performance.mark("nav-built");                             // a timestamp, used when testing that menus are built before the first paint
