@@ -1,8 +1,8 @@
 [
   {
-    "slug": "electricity-magnetism",
     "title": "Electricity & Magnetism",
     "short": "E&M",
+    "slug": "electricity-magnetism",
     "units": [
       {
         "number": 1,
@@ -11,13 +11,16 @@
       {
         "number": 2,
         "title": "Gauss's Law"
+      },
+      {
+        "number": 3,
+        "title": "test unit"
       }
     ]
   },
   {
-    "slug": "mechanics",
     "title": "Mechanics",
     "short": "Mechanics",
-    "units": []
+    "slug": "mechanics"
   }
 ]
