@@ -278,4 +278,3 @@ buildPrevNext();
 buildCrumbs();
 buildOutline();
 preloadLinks();
-performance.mark("nav-built");                             // a timestamp, used when testing that menus are built before the first paint

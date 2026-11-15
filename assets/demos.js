@@ -4,8 +4,6 @@
    A page picks a demo with an attribute on a <canvas>:
      <canvas data-demo="field">       interactive electric-field demo
      <canvas data-demo="projectile">  interactive projectile launcher
-     <canvas data-demo="background">  non-interactive loop of three demos,
-                                      used behind the home page
 
    Field demo: two charges, field lines leave the positive one and end on
    the negative one (or run off the canvas, which stands in for infinity).
@@ -15,9 +13,6 @@
 
    Projectile demo: press and drag to aim, release to launch. The dots are
    0.25 s apart, so equal spacing sideways shows constant horizontal speed.
-
-   The home-page background loops three scenes: field lines, projectiles,
-   and charges entering and leaving a magnetic field.
    ===================================================================== */
 
 (() => {                                           // wraps everything so names stay private
@@ -255,86 +250,6 @@
     return s;
   }
 
-  /* ================= MAGNETIC FIELD SCENE (home background only) ================= */
-  /* A vertical band holds a magnetic field pointing into the screen (the x marks). Charges fly in from the
-     left: a positive charge bends up, a negative one bends down, on a circle of radius r = v / w. Small
-     circles turn back out the left side; big ones leave on the right. Outside the band they fly straight. */
-  function magnetScene() {
-    const W = 1.6;                                 // turning rate in radians per second (the same for every speed)
-    const s = { w: 0, h: 0, x0: 0, x1: 0, time: 0, parts: [], nextSpawn: 0, spawned: 0 };
-
-    s.setSize = (w, h) => {
-      s.w = w; s.h = h;
-      const bw = Math.min(w * 0.3, 420);           // band width
-      s.x0 = w * 0.5; s.x1 = s.x0 + bw;            // left and right edges of the band
-    };
-
-    s.step = (dt) => {
-      s.time += dt;
-      if (s.time >= s.nextSpawn && s.parts.filter((p) => !p.outAt).length < 4) {   // at most four charges flying
-        const bw = s.x1 - s.x0;
-        const q = Math.random() < 0.5 ? 1 : -1;          // sign of the charge
-        let r, y;
-        if (s.spawned % 3 === 0) {                       // every third charge (starting with the first) makes a full half circle
-          r = Math.min(bw * (0.35 + Math.random() * 0.25), s.h * 0.2);   // small enough to fit inside the band and on screen
-          y = q > 0 ? 2 * r + s.h * (0.12 + Math.random() * 0.1)         // positive bends up, so start low enough for the whole arc
-                    : s.h * 0.85 - 2 * r - s.h * Math.random() * 0.1;    // negative bends down, so start high enough
-        } else {
-          r = bw * (0.4 + Math.random() * 1.4);          // any size: may turn back or sweep out the right side
-          y = s.h * (0.42 + Math.random() * 0.2);
-        }
-        s.spawned++;                                     // count charges so we know when the next half circle is due
-        s.parts.push({ x: s.x0 - Math.min(s.w * 0.2, 260), y, speed: W * r, ang: 0, q, trail: [], t0: s.time, outAt: 0 });
-        s.nextSpawn = s.time + 1.3 + Math.random() * 0.8;
-      }
-      for (const p of s.parts) {
-        if (p.outAt) continue;                     // already left the screen: only fading
-        const n = Math.ceil(dt / 0.008), h = dt / n;   // tiny sub-steps keep the circle accurate
-        for (let i = 0; i < n; i++) {
-          if (p.x >= s.x0 && p.x <= s.x1) p.ang += (p.q > 0 ? -1 : 1) * W * h;   // inside the field: the direction turns
-          p.x += Math.cos(p.ang) * p.speed * h;
-          p.y += Math.sin(p.ang) * p.speed * h;
-        }
-        p.trail.push([p.x, p.y]);
-        if (p.x < -30 || p.x > s.w + 30 || p.y < -30 || p.y > s.h + 30) p.outAt = s.time;
-      }
-      s.parts = s.parts.filter((p) => !p.outAt || s.time - p.outAt < 2);   // drop faded charges
-    };
-
-    s.draw = (ctx) => {
-      const grid = css("--grid");
-      const base = ctx.globalAlpha;                      // the alpha this scene was given (it changes during a crossfade)
-      ctx.fillStyle = grid; ctx.globalAlpha = base * 0.12;   // the band's faint tint
-      ctx.fillRect(s.x0, 0, s.x1 - s.x0, s.h);
-      ctx.globalAlpha = base;
-      ctx.strokeStyle = grid; ctx.lineWidth = 1.2;
-      ctx.beginPath();                                   // x marks = field pointing into the screen
-      for (let x = s.x0 + 19; x < s.x1; x += 38) {
-        for (let y = 19; y < s.h; y += 38) {
-          ctx.moveTo(x - 4, y - 4); ctx.lineTo(x + 4, y + 4);
-          ctx.moveTo(x + 4, y - 4); ctx.lineTo(x - 4, y + 4);
-        }
-      }
-      ctx.moveTo(s.x0, 0); ctx.lineTo(s.x0, s.h);        // band edges
-      ctx.moveTo(s.x1, 0); ctx.lineTo(s.x1, s.h);
-      ctx.stroke();
-      for (const p of s.parts) {
-        const before = ctx.globalAlpha;
-        const fadeIn = Math.min(1, (s.time - p.t0) / 0.3);
-        const fadeOut = p.outAt ? Math.max(0, 1 - (s.time - p.outAt) / 2) : 1;
-        ctx.globalAlpha = before * fadeIn * fadeOut;
-        const color = css(p.q > 0 ? "--pos" : "--neg");  // red = positive, blue = negative
-        ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.8; ctx.lineCap = "round";
-        ctx.beginPath();
-        p.trail.forEach((t, i) => { if (i === 0) ctx.moveTo(t[0], t[1]); else ctx.lineTo(t[0], t[1]); });
-        ctx.stroke();
-        if (!p.outAt) { ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, 2 * Math.PI); ctx.fill(); }
-        ctx.globalAlpha = before;
-      }
-    };
-    return s;
-  }
-
   /* ================= INTERACTIVE FIELD ================= */
   function mountField(canvas) {
     const ctx = canvas.getContext("2d");
@@ -489,54 +404,9 @@
     const z = fit(canvas, ctx, 2); s.setSize(z.w, z.h); draw();
   }
 
-  /* ================= BACKGROUND LOOP (home page) ================= */
-  function mountBackground(canvas) {
-    const ctx = canvas.getContext("2d");
-    const field = fieldScene({ lines: 14, step: 4, maxSteps: 1200 });  // fewer, coarser lines: cheaper to redraw
-    const proj = projectileScene("ambient");
-    const mag = magnetScene();
-    const scenes = [field, proj, mag];            // the loop plays these in order
-    const SEG = 12, FADE = 1.2;                    // seconds per scene, and length of the crossfade
-    let w = 0, h = 0, elapsed = 0, last = 0, raf = 0;
-
-    const drawScene = (scene, a) => { ctx.globalAlpha = a; scene.draw(ctx); ctx.globalAlpha = 1; };
-    function render() {
-      ctx.clearRect(0, 0, w, h);
-      const n = scenes.length, i = Math.floor(elapsed / SEG) % n, p = elapsed % SEG;   // which scene, and how far into it
-      if (p < FADE && elapsed >= SEG) {            // crossfade from the previous scene
-        const f = 1 - Math.pow(1 - p / FADE, 3);   // ease-out: the new scene arrives quickly, then settles
-        drawScene(scenes[(i + n - 1) % n], 1 - f);
-        drawScene(scenes[i], f);
-      } else drawScene(scenes[i], 1);
-    }
-
-    function tick(now) {
-      raf = requestAnimationFrame(tick);
-      if (now - last < 28) return;                 // about 30 frames a second; 28 (not 33) so a 60 Hz screen gets an even every-other-frame rhythm
-      const dt = Math.min(0.1, (now - last) / 1000); last = now;
-      elapsed += dt;
-      field.ambient(elapsed); proj.step(dt); mag.step(dt);
-      render();
-    }
-
-    const resize = () => { const z = fit(canvas, ctx, 2); w = z.w; h = z.h; field.setSize(w, h); proj.setSize(w, h); mag.setSize(w, h); render(); };
-    new ResizeObserver(resize).observe(canvas);
-    resize();
-    matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
-
-    if (reduceMotion) { field.ambient(0); render(); return; }   // one still frame, no loop
-    document.addEventListener("visibilitychange", () => {      // pause while the tab is hidden
-      cancelAnimationFrame(raf);
-      if (!document.hidden) { last = performance.now(); raf = requestAnimationFrame(tick); }
-    });
-    last = performance.now();
-    raf = requestAnimationFrame(tick);
-  }
-
   for (const canvas of canvases) {                 // start whichever demo each canvas asks for
     const kind = canvas.dataset.demo;
     if (kind === "field") mountField(canvas);
     else if (kind === "projectile") mountProjectile(canvas);
-    else if (kind === "background") mountBackground(canvas);
   }
 })();

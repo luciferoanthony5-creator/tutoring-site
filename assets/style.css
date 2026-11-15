@@ -218,7 +218,6 @@ body.home footer { background: var(--paper); position: relative; }  /* footer st
   color: var(--ink); text-decoration: none;
 }
 .subject-row .count { font-family: var(--font-ui); color: var(--ink-soft); font-size: .95rem; }
-.subject-row.soon { opacity: .55; }            /* dimmed: not built yet */
 
 /* Subject page: units are native <details> elements (collapsible for free). */
 .unit-controls { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -297,10 +296,8 @@ body.home footer { background: var(--paper); position: relative; }  /* footer st
   border: 1.5px solid currentColor; padding: 2px 6px; flex: none;
   color: var(--ink-soft);                        /* default tag colour (notes etc.) */
 }
-.downloads a[href*="worksheet"] .pdf { color: var(--pos-ink); }  /* worksheet = red */
-.downloads a[href*="solutions"] .pdf { color: var(--neg); }      /* answer key = blue */
-.downloads .pdf.ws  { color: var(--pos-ink); }                   /* same colours by class: pages made by scripts/build.py mark the tag itself */
-.downloads .pdf.key { color: var(--neg); }
+.downloads .pdf.ws  { color: var(--pos-ink); }                   /* worksheet = red (scripts/build.py puts the class on the tag) */
+.downloads .pdf.key { color: var(--neg); }                       /* answer key = blue */
 .downloads .file { margin-left: auto; color: var(--ink-soft); font-size: .88rem; }
 
 /* Reserved ad slot (Phase 4). Hidden until AdSense is set up. */

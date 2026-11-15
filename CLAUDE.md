@@ -47,7 +47,7 @@ per lesson. Don't restyle existing pages without being asked.
 ## Working with me
 - I'm new to HTML/CSS/JS: put a short comment beside each line explaining the syntax.
 - Test locally with `python3 scripts/build.py` then `python3 -m http.server 8000` (YouTube fails from `file://`).
-- Commit with a clear message; I push. Custom-domain steps are in the README.
+- Commit with a clear message and push to `main` when the work is done and checked (Anthony allowed pushing on 2026-11-14). Custom-domain steps are in the README.
 
 ## Design tools
 - The site's chosen style (see Style decisions: "Field Lines, drawn live", Newsreader + Familjen Grotesk, indigo ink, red/blue charge colours) wins over any skill's default taste.

@@ -103,3 +103,4 @@
 - About page: Anthony is a mechanical engineering undergraduate, tutor and learning assistant (was "physics teacher").
 - Checked in Chromium (Playwright) at 1280 and 390 px: menus are built 50 ms before first paint, no sideways scroll, no console errors except YouTube's for placeholder video IDs; add / remove / bad-subject cases of `build.py`.
 - Not checked: the workflow and Pages CMS themselves (they only run on GitHub after a push and Anthony's setup), Safari, Firefox, dark mode for the new breadcrumb and Previous / Next (they use the existing tokens).
+- Cleanup: removed the unused canvas home background from `demos.js` (magnetic scene and loop, 130 lines), the old filename-based PDF tag colours, an unused `.soon` style and a test timestamp in `nav.js`. Claude may now push to `main` (CLAUDE.md).
