@@ -45,7 +45,7 @@ Units are native `<details>` and start expanded. Answer keys are posted openly. 
 per lesson. Don't restyle existing pages without being asked.
 
 ## Working with me
-- I'm new to HTML/CSS/JS: put a short comment beside each line explaining the syntax.
+- I'm new to HTML/CSS/JS: put a short comment beside each line explaining the syntax. Utalize spaces too to organize the code. 
 - Test locally with `python3 scripts/build.py` then `python3 -m http.server 8000` (YouTube fails from `file://`).
 - Commit with a clear message and push to `main` when the work is done and checked (Anthony allowed pushing on 2026-11-14). Custom-domain steps are in the README.
 
