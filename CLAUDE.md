@@ -51,6 +51,17 @@ per lesson. Don't restyle existing pages without being asked.
 - Test locally with `python3 scripts/build.py` then `python3 -m http.server 8000` (YouTube fails from `file://`).
 - Commit with a clear message and push to `main` when the work is done and checked (Anthony allowed pushing on 2026-11-14). Custom-domain steps are in the README.
 
+## Token use
+Keep usage low. Before starting a task, check whether it wastes resources:
+- Look at `git status` / `git diff --stat` first: the work may already be done and only need checking.
+- No subagents, design skills or Playwright MCP unless I name them or the task cannot be done without them.
+- Browser checks: one script run instead of many tool calls. `node scripts/check-browsers.js <playwright module> <screenshot folder>`
+  tests Chromium, Firefox and WebKit at 320, 390 and 1280px and prints a few lines (worked on 2026-11-14; the module is under
+  `~/.npm/_npx/*/node_modules/playwright`, browsers under `~/.cache/ms-playwright`). Look at one or two screenshots at most.
+- Stop the local server with `pkill -f http.server` as its own command (it also ends the shell that runs it).
+- Read only the parts of files that are needed (`git diff`, `grep -n`), batch commands into one call, keep reports short.
+- Start a fresh session (`/clear`) when switching tasks.
+
 ## Design tools
 - The site's chosen style (see Style decisions: "Field Lines, drawn live", Newsreader + Familjen Grotesk, indigo ink, red/blue charge colours) wins over any skill's default taste.
 - Use only the skill I name in a request (`emil-design-eng`, `impeccable`, `design-taste-frontend`, or `frontend-design`). Don't combine them unless I ask. (The Taste skill's repo name is `design-taste-frontend`, not `-v1`.)
