@@ -74,8 +74,9 @@ def main():
     # ---- read every lesson file and attach it to its unit ----------------
     problems = []                                   # collected and shown together at the end
     for subject in subjects:
+        subject.setdefault("units", [])             # the editor drops an empty list, so a subject with no units has no "units" key
         for unit in subject["units"]:
-            unit["lessons"] = []                    # filled in below
+            unit["lessons"] = []                  # filled in below
     for path in sorted((CONTENT / "lessons").glob("*.json")):
         lesson = load(path)
         where = path.relative_to(ROOT)
