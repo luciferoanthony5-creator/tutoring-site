@@ -71,18 +71,6 @@ const SUBJECTS = [
             "review": true
           }
         ]
-      },
-      {
-        "number": 3,
-        "folder": "unit-3",
-        "title": "test unit",
-        "lessons": [
-          {
-            "slug": "test-lesson",
-            "title": "3.1 test lesson",
-            "note": "notes test. hello this is a note."
-          }
-        ]
       }
     ]
   },
