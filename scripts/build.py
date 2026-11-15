@@ -27,7 +27,7 @@ from pathlib import Path   # Path = a file or folder location
 ROOT = Path(__file__).resolve().parent.parent     # the repo's top folder (this file sits in scripts/)
 CONTENT = ROOT / "content"                        # "/" joins path pieces
 MANIFEST = CONTENT / ".generated.json"            # remembers which pages the last run made
-STATIC_PAGES = ["index.html", "about.html", "privacy.html"]   # hand-written pages listed in the sitemap
+STATIC_PAGES = ["index.html", "search.html", "about.html", "privacy.html"]   # hand-written pages listed in the sitemap
 
 
 def load(path):
@@ -134,13 +134,13 @@ def main():
                 downloads = ('    <!-- Downloads, in order: worksheet, answer key, extras. -->\n'
                              f'    <div class="downloads">\n{rows}    </div>\n') if rows else ""
                 vid = youtube_id(lesson.get("video"))
-                video = ('    <!-- Video: the YouTube ID comes from the lesson\'s "video" field. -->\n'
-                         '    <div class="video">\n'
-                         f'      <iframe src="https://www.youtube-nocookie.com/embed/{esc(vid)}"\n'
-                         f'              title="{esc(lesson["title"])}"\n'
-                         '              allow="fullscreen" loading="lazy"\n'
-                         '              referrerpolicy="strict-origin-when-cross-origin"></iframe>\n'
-                         '    </div>\n') if vid else ""
+                # The video starts as a picture with a play button (a plain link to YouTube). nav.js swaps in the
+                # real player when it is clicked, so the page loads fast and never shows an empty black box.
+                video = ('    <!-- Video: a thumbnail link; nav.js turns it into the YouTube player on click. The ID comes from the lesson\'s "video" field. -->\n'
+                         f'    <a class="video" href="https://www.youtube.com/watch?v={esc(vid)}" data-video="{esc(vid)}">\n'
+                         f'      <span class="play" aria-hidden="true"></span>\n'
+                         f'      <span class="video-label">Play video: {esc(lesson["title"])}</span>\n'
+                         '    </a>\n') if vid else ""
                 author = str(lesson.get("author") or "").strip()
                 byline = f'      <p class="byline">Lesson by {esc(author)}</p>\n' if author else ""
                 values = {                          # what goes into each {{placeholder}} of the template
@@ -175,6 +175,7 @@ def main():
                 if lesson["kind"] == "overview": item["overview"] = True
                 if lesson["kind"] == "review": item["review"] = True
                 if lesson.get("note"): item["note"] = lesson["note"]
+                if lesson.get("summary"): item["summary"] = lesson["summary"]   # used by the search page
                 lessons.append(item)
             units.append({"number": unit["number"], "folder": unit["folder"], "title": unit["title"], "lessons": lessons})
         listing.append({"slug": subject["slug"], "title": subject["title"], "short": subject.get("short") or subject["title"], "units": units})

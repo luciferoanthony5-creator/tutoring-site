@@ -104,3 +104,12 @@
 - Checked in Chromium (Playwright) at 1280 and 390 px: menus are built 50 ms before first paint, no sideways scroll, no console errors except YouTube's for placeholder video IDs; add / remove / bad-subject cases of `build.py`.
 - Not checked: the workflow and Pages CMS themselves (they only run on GitHub after a push and Anthony's setup), Safari, Firefox, dark mode for the new breadcrumb and Previous / Next (they use the existing tokens).
 - Cleanup: removed the unused canvas home background from `demos.js` (magnetic scene and loop, 130 lines), the old filename-based PDF tag colours, an unused `.soon` style and a test timestamp in `nav.js`. Claude may now push to `main` (CLAUDE.md).
+
+## 2026-11-14 — Video thumbnails, search page, 320px header, cross-browser check
+
+- Videos: `build.py` now writes each video as a link to YouTube (`a.video`, works without JavaScript) with a play button; `setupVideos` in `nav.js` adds the YouTube thumbnail (hq720, then sddefault, then hqdefault; none for a missing video, so the dark box stays) and swaps in the `youtube-nocookie` player on click. Ctrl/Cmd/Shift-click still opens YouTube.
+- Search: `search.html` plus `buildSearch` in `nav.js`; filters all lessons by title, summary, subject and unit as you type. `build.py` copies each lesson's `summary` into `assets/lessons.js` and lists the page in the sitemap; the menu has a Search link.
+- 320px header: below 380px the brand is smaller and hides `.com`. No sideways scroll at 320, 390 or 1280px.
+- Checked with one Playwright script in Chromium 156, Firefox 159 and WebKit 27.2 (Safari's engine) at 320, 390 and 1280px: home, search, about, E&M and a lesson page; no overflow, no page errors, search results and empty state, video click and touch tap swap in the player, Menu button opens by touch tap, thumbnail loads with a real video ID in all three.
+- Not checked: a real phone (taps were emulated touch events), real Safari on iOS/macOS (WebKit on Linux is close but not identical). The lessons still hold placeholder video IDs, so no thumbnail shows until real IDs are entered.
+- Seen, not changed: at 320px "Worksheet 2.2" and its file name wrap onto two lines in the downloads row.

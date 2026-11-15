@@ -57,6 +57,7 @@ function buildMenu() {
     }
     html += `</ul></li>`;
   }
+  html += `<li><a href="${ROOT}search.html">Search</a></li>`;
   html += `<li><a href="${ROOT}about.html">About</a></li>`;
   $("menu").innerHTML = html;
 }
@@ -244,6 +245,76 @@ function preloadLinks() {
   document.addEventListener("touchstart", warm, { passive: true });
 }
 
+/* --- Lesson page: video thumbnail that becomes the player when clicked --- */
+/* build.py writes each video as a plain link to YouTube (so it works even without JavaScript).
+   Here the link gets the video's thumbnail, and a click swaps it for the embedded player. */
+function setupVideos() {
+  for (const link of document.querySelectorAll("a.video[data-video]")) {
+    const id = encodeURIComponent(link.dataset.video);            // data-video -> dataset.video; encode so odd characters are safe in an address
+    const sizes = ["hq720", "sddefault", "hqdefault"];            // thumbnail files YouTube offers, sharpest first; not every video has the first two
+    let tryNumber = 0;
+
+    const img = new Image();                                      // same as document.createElement("img")
+    img.alt = "";                                                 // decorative: the link already has a text label
+    img.onerror = () => img.remove();                             // could not load at all: keep the plain dark box
+    img.onload = () => {
+      if (img.naturalWidth > 120) { img.classList.add("ok"); return; }   // a real thumbnail: fade it in (style.css)
+      tryNumber += 1;                                             // 120px wide = YouTube's grey "no picture" image
+      if (tryNumber < sizes.length) img.src = `https://i.ytimg.com/vi/${id}/${sizes[tryNumber]}.jpg`;   // try the next size
+      else img.remove();                                          // no thumbnail exists (e.g. a placeholder ID)
+    };
+    img.src = `https://i.ytimg.com/vi/${id}/${sizes[0]}.jpg`;
+    link.prepend(img);                                            // first inside the link, so the play button sits on top
+
+    link.addEventListener("click", (e) => {
+      if (e.ctrlKey || e.metaKey || e.shiftKey) return;           // Ctrl/Cmd/Shift-click: let the browser open YouTube in a new tab
+      e.preventDefault();                                         // otherwise stay on this page ...
+      const box = document.createElement("div");                  // ... and put the player where the thumbnail was
+      box.className = "video";
+      box.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1"
+        title="${esc(document.querySelector("main h1")?.textContent ?? "Lesson video")}"
+        allow="autoplay; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+      link.replaceWith(box);
+      box.querySelector("iframe").focus();                        // keyboard users land on the player
+    });
+  }
+}
+
+/* --- Search page: filter the list of every lesson as you type ---------- */
+function buildSearch() {
+  const input = $("q"), results = $("search-results"), count = $("search-count");
+  if (!input || !results) return;                                 // only search.html has these
+
+  // One lowercase string per lesson holding everything that can be searched.
+  const haystack = ALL.map((l) => `${l.title} ${l.summary ?? ""} ${l.subject.title} ${l.subject.short} unit ${l.unit.number} ${l.unit.title}`.toLowerCase());
+
+  function render() {
+    const query = input.value.trim();
+    const words = query.toLowerCase().split(/\s+/).filter(Boolean);            // "gauss  law" -> ["gauss","law"]; filter(Boolean) drops empty strings
+    const found = ALL.filter((l, i) => words.every((w) => haystack[i].includes(w)));   // keep lessons containing every word
+
+    results.innerHTML = found.map((l) =>
+      `<a class="result" href="${lessonPath(l.subject, l.unit, l)}">` +
+        `<span class="where">${esc(l.subject.title)} &middot; Unit ${l.unit.number}</span>` +
+        `<span class="t">${esc(l.title)}</span>` +
+        (l.summary ? `<span class="s">${esc(l.summary)}</span>` : "") +
+      `</a>`).join("");
+
+    if (!words.length)      count.textContent = `All ${ALL.length} lessons`;
+    else if (found.length)  count.textContent = `${found.length} of ${ALL.length} lessons match`;
+    else                    count.textContent = "No lessons match. Try one shorter word.";
+
+    const url = new URL(location.href);                           // keep the search in the address, so the page can be shared or reloaded
+    if (query) url.searchParams.set("q", query); else url.searchParams.delete("q");
+    history.replaceState(null, "", url);                          // replaceState changes the address without reloading
+  }
+
+  input.value = new URLSearchParams(location.search).get("q") ?? "";   // start from ?q=... if the address has one
+  input.addEventListener("input", render);                        // "input" fires on every keystroke
+  input.form?.addEventListener("submit", (e) => e.preventDefault());   // Enter must not reload the page
+  render();
+}
+
 /* --- Esc closes the open menu ----------------------------------------- */
 document.addEventListener("keydown", (e) => {          // runs on every key press
   const menu = $("menu");
@@ -276,5 +347,7 @@ revealHeadline();
 buildUnitList();
 buildPrevNext();
 buildCrumbs();
+setupVideos();
+buildSearch();
 buildOutline();
 preloadLinks();

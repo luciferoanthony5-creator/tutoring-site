@@ -8,7 +8,7 @@ One small build step: `python3 scripts/build.py` turns the lesson data in `conte
 Read `claude/website-plan.md` before larger changes; `claude/progress-log.md` has history.
 
 ## Structure
-- `index.html`, `about.html`, `privacy.html`, `404.html`
+- `index.html`, `search.html` (filters every lesson as you type; `buildSearch` in `nav.js`, uses each lesson's `summary`), `about.html`, `privacy.html`, `404.html`
 - `electricity-magnetism/index.html` (subject page), `unit-N/` with `index.html` overview,
   `N-M-topic.html` lessons, and `N-M-worksheet.pdf` / `N-M-solutions.pdf`
 - `content/` is the source for lessons: `site.json` (name, address), `subjects.json` (subjects and units), `lessons/*.json` (one per lesson). `templates/lesson.html` is the lesson page; `scripts/build.py` writes the lesson `.html` files, `assets/lessons.js` and `sitemap.xml` from them. Those three outputs are GENERATED: never edit them by hand.
@@ -41,6 +41,8 @@ and subject rows; logo dots pulse slowly. Menu dropdowns fade and drop in and Es
 Lesson pages get a sticky unit outline and a Subject / Unit breadcrumb built by `nav.js`.
 Clicks: pages cross-fade (`@view-transition`, header held still), links are preloaded on hover (speculation rules,
 prefetch fallback), and every row tints on press.
+Lesson videos are a thumbnail link with a play button (`a.video`, written by `build.py`); `setupVideos` in `nav.js` swaps in the YouTube player on click.
+Below 380px the brand drops its `.com` so the header fits at 320px.
 Units are native `<details>` and start expanded. Answer keys are posted openly. One real HTML file
 per lesson. Don't restyle existing pages without being asked.
 

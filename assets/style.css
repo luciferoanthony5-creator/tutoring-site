@@ -284,6 +284,60 @@ body.home footer { background: var(--paper); position: relative; }  /* footer st
 }
 .video iframe { width: 100%; height: 100%; border: 0; display: block; }
 
+/* Before it is clicked, the video is a link showing a thumbnail and a play button (nav.js adds the picture). */
+a.video { display: block; position: relative; }                  /* relative = anchor for the picture and the button */
+a.video img {
+  position: absolute; inset: 0; width: 100%; height: 100%;        /* fills the box ... */
+  object-fit: cover;                                              /* ... cropping instead of stretching */
+  opacity: 0; transition: opacity 240ms ease;                     /* hidden until nav.js knows it is a real thumbnail */
+}
+a.video img.ok { opacity: 1; }
+a.video .play {                                                   /* the round play button, centred */
+  position: absolute; left: 50%; top: 50%; width: 68px; height: 68px;
+  margin: -34px 0 0 -34px;                                        /* half its size up and left = centred */
+  border-radius: 50%; background: #FAFAFC;                        /* paper white in both light and dark mode: it sits on a picture */
+  box-shadow: 0 2px 14px rgb(11 12 30 / .35);                     /* lifts it off bright thumbnails */
+  transition: transform 160ms var(--ease-out);
+}
+a.video .play::before {                                           /* the triangle, drawn with borders */
+  content: ""; position: absolute; left: 27px; top: 21px;
+  border-left: 20px solid #1B1F4B;                                /* ink colour */
+  border-top: 13px solid transparent; border-bottom: 13px solid transparent;
+}
+a.video:active .play { transform: scale(0.94); }                  /* press feedback */
+@media (hover: hover) and (pointer: fine) {
+  a.video:hover .play { transform: scale(1.06); }                 /* grows a little under the mouse */
+  a.video:active .play { transform: scale(0.94); }                /* repeated so pressing wins over hovering */
+}
+.video-label {                                                    /* read by screen readers, not shown */
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+
+/* ----- Search page ------------------------------------------------------ */
+.search { font-family: var(--font-ui); max-width: 560px; }
+.search label { display: block; color: var(--ink-soft); font-size: .95rem; margin-bottom: 8px; }
+.search input {
+  width: 100%; padding: 12px 14px;
+  font: inherit; font-size: 1.1rem; color: var(--ink);            /* inherit = same font as the form */
+  background: var(--surface); border: 1px solid var(--line); border-radius: 0;   /* radius 0: iPhones round inputs by default */
+}
+.search-count { font-family: var(--font-ui); font-size: .95rem; color: var(--ink-soft); margin-bottom: -16px; }   /* sits close to the list below */
+#search-results { border-top: 1px solid var(--line); }
+.result {
+  display: grid; gap: 2px; padding: 16px 4px;                     /* three stacked lines */
+  border-bottom: 1px solid var(--line);
+  color: var(--ink); text-decoration: none;
+  transition: background-color 120ms ease;
+}
+.result .where { font-family: var(--font-ui); font-size: .85rem; color: var(--ink-soft); }   /* "Electricity & Magnetism · Unit 1" */
+.result .t     { font-size: 1.25rem; line-height: 1.25; }
+.result .s     { color: var(--ink-soft); font-size: 1rem; line-height: 1.45; }
+.result:active { background: var(--tint); transition-duration: 0s; }   /* instant tint on press */
+@media (hover: hover) and (pointer: fine) {
+  .result:hover { background: var(--tint); color: var(--ink); }
+  .result:hover .t { text-decoration: underline; text-underline-offset: 4px; }
+}
+
 /* Downloads: the red tag marks a worksheet, the blue tag an answer key. */
 .downloads { display: grid; gap: 0; border-top: 1px solid var(--line); font-family: var(--font-ui); }
 .downloads a {
@@ -476,11 +530,19 @@ body { -webkit-font-smoothing: antialiased; }            /* thinner, crisper tex
   .prevnext .next { grid-column: 1; text-align: left; }
 }
 
+/* Very narrow phones (320px): a smaller name and no ".com", so the header row fits beside the Menu button. */
+@media (max-width: 380px) {
+  .brand { font-size: 1.05rem; }
+  .brand::before { margin-right: 21px; }                          /* the second dot is a 13px shadow, so the gap stays clear of it */
+  .brand span { display: none; }                                  /* hides the ".com" part */
+}
+
 /* Reduced motion means gentler, not nothing: colour fades stay, sliding and rotating go. */
 @media (prefers-reduced-motion: reduce) {
   .unit::details-content, .unit[open]::details-content, .outline::details-content { transition: none; }   /* no height slide */
   .unit > summary::before, .unit[open]:not(.is-closing) > summary::before { transition: none; }          /* chevron flips instantly */
   .menu-btn, .unit-controls button { transition: background-color 120ms ease; }  /* no press shrink */
+  a.video .play { transition: none; transform: none !important; } /* play button does not grow or shrink */
   .menu { transform: none; transition: opacity 120ms ease, visibility 0s linear 120ms; }   /* phone menu: fade only, no drop */
   .menu.open { transition: opacity 120ms ease; }
   .bg-demo { animation: none; }                                             /* background appears without fading in */
